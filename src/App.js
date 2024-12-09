@@ -4,6 +4,7 @@ import { ThemeProvider } from "styled-components";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ListStadium from "./pages/ListStadium";
+import Booking from "./pages/Booking";
 const theme = {
   colors: {
     primary: "#007bff",
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/list-stadium" element={<ListStadium />} />
+          <Route path="/booking" element={<Booking />} />
         </Routes>
       </Router>
     </ThemeProvider>

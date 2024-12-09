@@ -1,5 +1,5 @@
 import Header from "@components/header/Header";
-import Map from "@components/map/Map";
+import ListContent from "@components/list-stadium/ListContent";
 import React from "react";
 import styled from "styled-components";
 // Styled Component
@@ -8,6 +8,7 @@ const ListStadium = () => {
   return (
     <Container>
       <Header />
+      <ListContent />
     </Container>
   );
 };

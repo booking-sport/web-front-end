@@ -518,7 +518,7 @@ const Map = () => {
       const [activeButton, setActiveButton] = useState(null);
 
       const handleButtonClick = (id) => {
-        setActiveButton(id); // Cập nhật nút được chọn
+        setActiveButton(id);
       };
       const sortList = [
         {
@@ -561,7 +561,11 @@ const Map = () => {
             id={id}
             onClick={() => handleButtonClick(id)}
           >
-            <Icon color={`${activeButton === id ? "#fff" : "#6C737F"}`} />
+            <Icon
+              width="24"
+              height="24"
+              color={`${activeButton === id ? "#fff" : "#6C737F"}`}
+            />
             <span>{title}</span>
           </button>
         );
@@ -569,6 +573,7 @@ const Map = () => {
       return (
         <SortContainer>
           {sortList &&
+            sortList.length > 0 &&
             sortList.map((item) => {
               return (
                 <SortItem

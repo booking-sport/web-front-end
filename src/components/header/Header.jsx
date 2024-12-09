@@ -46,7 +46,7 @@ const Header = () => {
         logo: ListStadium,
       },
       {
-        link: "#",
+        link: "/booking",
         title: "Đặt sân",
         logo: BookStadium,
       },
@@ -59,6 +59,7 @@ const Header = () => {
     return (
       <NavContainer>
         {listNav &&
+          listNav.length > 0 &&
           listNav.map((item, index) => {
             const LogoComponent = item?.logo;
             const isActive = location.pathname === item.link;
@@ -94,12 +95,12 @@ const Header = () => {
         logo: Home,
       },
       {
-        link: "#",
+        link: "/list-stadium",
         title: "Danh sách sân",
         logo: ListStadium,
       },
       {
-        link: "#",
+        link: "/booking",
         title: "Đặt sân",
         logo: BookStadium,
       },
@@ -112,25 +113,25 @@ const Header = () => {
 
     return (
       <MobileNav className={isMobileNavOpen ? "open" : ""}>
-        <MobileNavOverlay
-          onClick={() => setIsMobileNavOpen(false)} // Đóng Nav khi nhấn overlay
-        />
+        <MobileNavOverlay onClick={() => setIsMobileNavOpen(false)} />
         <div className="mobile-nav-content">
-          {listNav.map((item, index) => {
-            const LogoComponent = item?.logo;
-            const isActive = location.pathname === item.link;
-            return (
-              <NavItem key={index} className={isActive ? "active" : ""}>
-                <Link
-                  to={item?.link}
-                  onClick={() => setIsMobileNavOpen(false)} // Đóng Nav khi nhấn item
-                >
-                  <LogoComponent />
-                  {item?.title}
-                </Link>
-              </NavItem>
-            );
-          })}
+          {listNav &&
+            listNav.length > 0 &&
+            listNav.map((item, index) => {
+              const LogoComponent = item?.logo;
+              const isActive = location.pathname === item.link;
+              return (
+                <NavItem key={index} className={isActive ? "active" : ""}>
+                  <Link
+                    to={item?.link}
+                    onClick={() => setIsMobileNavOpen(false)}
+                  >
+                    <LogoComponent />
+                    {item?.title}
+                  </Link>
+                </NavItem>
+              );
+            })}
         </div>
       </MobileNav>
     );
