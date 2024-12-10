@@ -3,7 +3,7 @@ import {
   FootballIcon,
   SearchIconGrey,
 } from "@components/icons/svg";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
@@ -40,7 +40,25 @@ import {
   StarsContainer,
   TimeContainer,
 } from "./StyledList";
+import { getSportsFields } from "@components/services/fieldsService";
 const ListContent = () => {
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchFields = async () => {
+      try {
+        const data = await getSportsFields();
+        setFields(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFields();
+  }, []);
+  console.log(fields, 99);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -478,7 +496,7 @@ const ListContent = () => {
             <RateDisplayContainer>
               <StarsContainer>{renderStars(score)}</StarsContainer>
               <RatingCount>
-                {score.toFixed(1)}
+                {score?.toFixed(1)}
                 {` `}({count} ratings)
               </RatingCount>
             </RateDisplayContainer>
@@ -486,7 +504,7 @@ const ListContent = () => {
         };
         return (
           <StadiumItemContainer>
-            <img src={item?.image} alt="" className="stadium-image" />
+            <img src={item?.images[0]} alt="" className="stadium-image" />
             <div className=" stadium-info stadium-info-header">
               <span className="stadium-name">{item.name}</span>
               <RateDisplay score={item.ratePoint} count={item.rateCount} />
@@ -508,10 +526,10 @@ const ListContent = () => {
               >
                 Chi tiết
               </button>
-              <button className="book">
+              <a href={`/booking/${item.id}`} className="booking">
                 <BookIcon />
                 <span>Đặt lịch</span>
-              </button>
+              </a>
             </div>
           </StadiumItemContainer>
         );
@@ -704,7 +722,9 @@ const ListContent = () => {
                   <h3 className="name">{selectedStadium.name}</h3>
                   <h3 className="type">{selectedStadium?.type}</h3>
                 </div>
-                <button className="booking">Đặt sân</button>
+                <div className="booking">
+                  <a href={`/booking/${selectedStadium.id}`}>Đặt sân</a>
+                </div>
               </div>
               <img src={selectedStadium.image} alt="" className="popup-image" />
             </div>
@@ -737,9 +757,9 @@ const ListContent = () => {
 
       return (
         <RightBarContainer>
-          {dummyStadium &&
-            dummyStadium.length > 0 &&
-            dummyStadium.map((item, index) => (
+          {fields &&
+            fields.length > 0 &&
+            fields.map((item, index) => (
               <StadiumItem key={index} item={item} />
             ))}
           {showPopup && selectedStadium && <PopupBar />}

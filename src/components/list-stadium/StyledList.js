@@ -381,7 +381,8 @@ export const StadiumItemContainer = styled.div`
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-    button {
+    button,
+    a {
       padding: 6px 16px;
       border-radius: 60px;
       background: var(--background-paper, #fff);
@@ -396,7 +397,7 @@ export const StadiumItemContainer = styled.div`
         font-weight: 600;
         line-height: 24px;
       }
-      &.book {
+      &.booking {
         border-radius: 60px;
         background: var(--primary-main, #1d9a6c);
         /* elevation/1 */
@@ -412,6 +413,7 @@ export const StadiumItemContainer = styled.div`
         font-weight: 600;
         line-height: 24px;
         gap: 8px;
+        text-decoration: none;
       }
     }
   }
@@ -674,8 +676,11 @@ export const PopupBarContainer = styled.div`
         /* elevation/1 */
         box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
         border: 0;
-        height: 42px;
         padding: 8px 22px;
+        a {
+          text-decoration: none;
+          color: var(--primary-contrast, #fff);
+        }
       }
     }
     .popup-image {
