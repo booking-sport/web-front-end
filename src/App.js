@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ListStadium from "./pages/ListStadium";
 import Booking from "./pages/Booking";
+import Account from "./pages/Account";
 const theme = {
   colors: {
     primary: "#007bff",
@@ -45,6 +46,7 @@ const App = () => {
           />
           <Route path="/list-stadium" element={<ListStadium user={user} />} />
           <Route path="/booking/:id" element={<Booking user={user} />} />
+          <Route path="/account" element={<Account user={user} />} />
         </Routes>
       </Router>
     </ThemeProvider>

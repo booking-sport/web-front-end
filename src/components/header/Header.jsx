@@ -41,6 +41,8 @@ const Header = ({ user }) => {
       </LogoContainer>
     );
   };
+  const savedUser = JSON.parse(localStorage.getItem("user"));
+
   const Nav = () => {
     const listNav = [
       {
@@ -59,7 +61,7 @@ const Header = ({ user }) => {
         logo: BookStadium,
       },
       {
-        link: "/#",
+        link: `${savedUser ? "/account" : "/login"}`,
         title: "Quản lý tài khoản",
         logo: Account,
       },
@@ -125,7 +127,7 @@ const Header = ({ user }) => {
         logo: BookStadium,
       },
       {
-        link: "/#",
+        link: `${savedUser ? "/account" : "/login"}`,
         title: "Quản lý tài khoản",
         logo: Account,
       },
