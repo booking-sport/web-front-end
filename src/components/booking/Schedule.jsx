@@ -5,6 +5,7 @@ import {
   ArrowRightIcon,
   NextIcon,
   PrevIcon,
+  DeleteIcon,
 } from "@components/icons/svg";
 import {
   getFieldDetails,
@@ -15,7 +16,13 @@ import moment from "moment";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { ScheduleContainer } from "./StyledSchedule";
+import {
+  ScheduleContainer,
+  TitleField,
+  InputFieldContainer,
+  InputField,
+} from "./StyledSchedule";
+
 const Schedule = () => {
   const { id } = useParams();
   const [selectedSlots, setSelectedSlots] = useState({});
@@ -30,6 +37,9 @@ const Schedule = () => {
   const [popupInfo, setPopupInfo] = useState(null);
   const [isFixedBooking, setIsFixedBooking] = useState(false);
   const [fixedBookingData, setFixedBookingData] = useState(null);
+  const [isBooking, setIsBooking] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(100);
+  console.log(selectedDate, 222);
   let navigate = useNavigate();
 
   //   const fields = [
@@ -46,7 +56,7 @@ const Schedule = () => {
       .add(i * 30, "minutes")
       .format("HH:mm"),
   );
-
+  console.log(priceData);
   //   const bookedSlots = {
   //     "Sân thường 1": ["05:00", "05:30", "06:00"],
   //     "Sân thường 2": ["05:00", "05:30"],
@@ -164,7 +174,7 @@ const Schedule = () => {
 
     fetchPrice();
   }, [id, dayOfWeek]);
-  const groupTimeSlotsByField = (slots) => {
+  const groupTimeSlotsByField = (slots, selectedSlots, date, fieldNames) => {
     const groupedByField = {};
 
     slots.forEach((slot) => {
@@ -177,6 +187,7 @@ const Schedule = () => {
       const sortedTimes = times.sort(
         (a, b) => moment(a, "HH:mm") - moment(b, "HH:mm"),
       );
+
       const groupedTimes = [];
       let currentGroup = [sortedTimes[0]];
 
@@ -195,28 +206,109 @@ const Schedule = () => {
 
       return {
         field,
-        times: groupedTimes.map((group) => ({
-          start: group[0],
-          end: moment(group[group.length - 1], "HH:mm")
+        name: fieldNames[field],
+        times: groupedTimes.map((group) => {
+          const start = group[0];
+          const end = moment(group[group.length - 1], "HH:mm")
             .add(30, "minutes")
-            .format("HH:mm"),
-        })),
+            .format("HH:mm");
+          const timeDiff = moment(end, "HH:mm").diff(
+            moment(start, "HH:mm"),
+            "minutes",
+          );
+          console.log(timeDiff, 333);
+          return {
+            start,
+            end,
+            price: group.reduce(
+              (sum, time) => sum + selectedSlots[`${field}-${time}`],
+              0,
+            ),
+            duration: timeDiff,
+          };
+        }),
       };
     });
 
-    return result;
+    const orders = result.flatMap(({ field, name, times }) =>
+      times.map((time) => ({
+        orderType: "single_booking",
+        price: time.price,
+        date: date,
+        fieldId: parseInt(field, 10),
+        fieldName: name,
+        beginTime: `${time.start}:00`,
+        endTime: `${time.end}:00`,
+        duration: time.duration,
+      })),
+    );
+
+    return { groupedData: result, orders };
   };
 
-  const handleSelect = (field, time, price) => {
+  const handleSelect = (field, fieldName, time, price) => {
     const slot = `${field}-${time}`;
+    console.log(slot, 888);
     const updatedSlots = { ...selectedSlots };
+    const updatedFieldNames = { ...popupInfo?.fieldNames, [field]: fieldName };
+    console.log(fieldName, 6666);
 
     if (updatedSlots[slot]) {
       delete updatedSlots[slot];
     } else {
       updatedSlots[slot] = price;
     }
-    const groupedData = groupTimeSlotsByField(Object.keys(updatedSlots));
+
+    const { groupedData, orders } = groupTimeSlotsByField(
+      Object.keys(updatedSlots),
+      updatedSlots,
+      selectedDate.toLocaleDateString("en-CA"),
+      updatedFieldNames,
+    );
+
+    const totalPrice = Object.values(updatedSlots).reduce(
+      (sum, currentPrice) => sum + currentPrice,
+      0,
+    );
+    const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
+
+    setPopupInfo({
+      groupedData,
+      totalPrice,
+      orders,
+      totalTime,
+      fieldNames: updatedFieldNames,
+    });
+
+    setSelectedSlots(updatedSlots);
+  };
+  const handleDeleteOrder = (order) => {
+    console.log(
+      "delete:",
+      order.fieldId,
+      order.beginTime.slice(0, -3),
+      order.endTime.slice(0, -3),
+    );
+    const slotKeysToRemove = popupInfo.groupedData
+      .find((group) => group.field === order.fieldId)
+      ?.times.find(
+        (time) =>
+          time.start === order.beginTime.slice(0, -3) &&
+          time.end === order.endTime.slice(0, -3),
+      );
+    console.log(slotKeysToRemove, 3333);
+    if (!slotKeysToRemove) return;
+
+    const updatedSlots = { ...selectedSlots };
+    slotKeysToRemove.forEach((slotKey) => {
+      delete updatedSlots[slotKey];
+    });
+
+    const { groupedData, orders } = groupTimeSlotsByField(
+      Object.keys(updatedSlots),
+      updatedSlots,
+      selectedDate.toLocaleDateString("en-CA"),
+    );
 
     const totalPrice = Object.values(updatedSlots).reduce(
       (sum, currentPrice) => sum + currentPrice,
@@ -226,14 +318,15 @@ const Schedule = () => {
     setPopupInfo({
       groupedData,
       totalPrice,
+      orders,
     });
 
     setSelectedSlots(updatedSlots);
   };
 
-  const renderCells = (fieldName, unitPrices) =>
+  const renderCells = (fieldId, fieldName, unitPrices) =>
     timeSlots.map((time, index) => {
-      const slotKey = `${fieldName}-${time}`;
+      const slotKey = `${fieldId}-${time}`;
       const isSelected = selectedSlots[slotKey];
       const unitPrice = unitPrices[index];
       const price = unitPrice?.price;
@@ -248,128 +341,337 @@ const Schedule = () => {
           })}
           onClick={() => {
             if (status === "available") {
-              handleSelect(fieldName, time, price);
+              handleSelect(fieldId, fieldName, time, price);
             }
           }}
-        ></td>
+        >
+          {price}
+        </td>
       );
     });
+  useEffect(() => {
+    const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
+    const fetchPrice = async () => {
+      try {
+        setLoading(true);
+        const data = await getPriceDetails(id, dayOfWeek, formattedDate);
+        setPriceData(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrice();
+  }, [id, dayOfWeek]);
 
   //   const closePopup = () => {
   //     setPopupInfo(null);
   //   };
-  console.log(popupInfo, 999);
+  console.log(stadium, 999);
   const handleSaveFixedBooking = (data) => {
     setFixedBookingData(data);
     setIsFixedBooking(true);
   };
-  return (
-    stadium && (
-      <ScheduleContainer className="schedule-container">
+  const handlePayment = () => {
+    setIsBooking(!isBooking);
+  };
+
+  const Payment = () => {
+    const [userName, setUserName] = useState("");
+    const [userNumber, setUserNumber] = useState("");
+    const [note, setNote] = useState("");
+    const handleUserName = (e) => {
+      setUserName(e.target.value);
+    };
+    const handleChangeNumber = (e) => {
+      setUserNumber(e.target.value);
+    };
+    const handleChangeNote = (e) => {
+      setNote(e.target.value);
+    };
+    console.log(popupInfo, 1111);
+    const formatMinutesToHours = (minutes) => {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return `${hours} giờ ${remainingMinutes} phút`;
+    };
+    return (
+      <ScheduleContainer className="payment-container">
         <div className="header">
           <div className="title">
-            <button className="close-btn" onClick={() => navigate(-1)}>
+            <button className="close-btn" onClick={handlePayment}>
               <ArrowLeftIcon />
               Quay lại
             </button>
-            <h3 className="name">Lịch sân - {stadium.name}</h3>
+            <h3 className="name">Đặt sân</h3>
           </div>
-          <button
-            className="fixed-booking"
-            onClick={() => console.log(selectedSlots)}
-          >
-            Đặt lịch cố định
-          </button>
         </div>
         <div className="content-container">
           <div className="content">
             <div className="content-header">
-              <DateTimePicker
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                setDayOfWeek={setDayOfWeek}
-              />
-              <div className="unit-status">
-                <div className="unit-item">
-                  <div className="color white"></div>
-                  <span className="text-status">Đang trống</span>
+              <p className="title">Thông tin người đặt</p>
+              <div className="info">
+                <div className="name-number">
+                  <InputFieldContainer>
+                    <TitleField>Họ và tên</TitleField>
+                    <InputField
+                      placeholder="Họ và tên"
+                      type="text"
+                      onChange={handleUserName}
+                      value={userName}
+                    />
+                  </InputFieldContainer>
+                  <InputFieldContainer>
+                    <TitleField>Số điện thoại</TitleField>
+                    <InputField
+                      placeholder="Số điện thoại"
+                      type="number"
+                      onChange={handleChangeNumber}
+                      value={userNumber}
+                    />
+                  </InputFieldContainer>
                 </div>
-                <div className="unit-item">
-                  <div className="color green"></div>
-                  <span className="text-status">Đang chọn</span>
-                </div>
-                <div className="unit-item">
-                  <div className="color grey"></div>
-                  <span className="text-status">Khóa</span>
-                </div>
-                <div className="unit-item">
-                  <div className="color red"></div>
-                  <span className="text-status">Đã đặt</span>
-                </div>
+                <InputFieldContainer>
+                  <TitleField> Ghi chú (cho chủ sân)</TitleField>
+                  <InputField
+                    placeholder="Nhập ghi chú"
+                    type="text"
+                    onChange={handleChangeNote}
+                    value={note}
+                  />
+                </InputFieldContainer>
               </div>
-              {popupInfo &&
-                selectedSlots &&
-                Object.keys(selectedSlots).length > 0 && (
-                  <div className="popup-order-overlay">
-                    <div className="popup-order-content">
-                      <div className="info">
-                        <span>Thời gian đã chọn: </span>
-                        <div className="orders">
-                          {popupInfo.groupedData.map((group, index) => (
-                            <div key={index}>
-                              <ul>
-                                {group.times
-                                  .map(
-                                    (time, idx) =>
-                                      `${time.start} - ${time.end}`,
-                                  )
-                                  .join(", ")}
-                              </ul>
-                              {`(${group.field})`}
-                              {index < popupInfo.groupedData.length - 1 && ", "}
-                            </div>
-                          ))}
+            </div>
+            <div className="content-info">
+              <p className="title">Thông tin đặt lịch</p>
+              <div className="info">
+                <div className="stadium">
+                  <span className="name-title">Tên sân:</span>
+                  <span>{stadium.name}</span>
+                </div>
+                <div className="address">
+                  <span className="name-title">Địa chỉ:</span>
+                  <span>{stadium.address}</span>
+                </div>
+                <div className="detail-info">
+                  <div className="date">
+                    <span className="name-title">Ngày:</span>
+                    <span>
+                      {selectedDate
+                        .toLocaleDateString("sv-SE")
+                        .replace(/-/g, "/")}
+                    </span>
+                  </div>
+                  {popupInfo?.orders &&
+                    popupInfo?.orders.length > 1 &&
+                    popupInfo?.orders.map((order, index) => {
+                      return (
+                        <div className="order-item" key={index}>
+                          <div>
+                            <span className="title">
+                              {index + 1}. {order.fieldName}:
+                            </span>
+                            <span className="time">
+                              {order.beginTime} - {order.endTime}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="price">
+                              {(order.price * 1000).toLocaleString("vi-VN")} đ
+                            </span>
+                            <button
+                              className="delete"
+                              onClick={() => handleDeleteOrder(order)}
+                            >
+                              <DeleteIcon />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="payment">
-                        <div className="total-price">
-                          <span className="title">Tổng tiền:</span>
-                          <span className="price">{popupInfo.totalPrice}k</span>
+                      );
+                    })}
+                </div>
+                <div className="line"></div>
+                <div className="overview">
+                  <div className="total-time">
+                    <span className="title">Tổng giờ:</span>
+                    <span className="time">
+                      {formatMinutesToHours(popupInfo?.totalTime)}
+                    </span>
+                  </div>
+                  <div className="total-price">
+                    <span className="title">Tổng tiền:</span>
+                    <span>
+                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="payment-method">
+                    <span className="title">Phương thức thanh toán</span>
+                    <div>
+                      {stadium.deposit === 0 ? (
+                        <p>Thanh toán tại sân</p>
+                      ) : (
+                        <div>
+                          <label>
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="30"
+                              checked={paymentMethod === stadium.deposit}
+                              onChange={() => setPaymentMethod(stadium.deposit)}
+                            />
+                            Thanh toán trước {stadium.deposit}%
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value="100"
+                              checked={paymentMethod === 100}
+                              onChange={() => setPaymentMethod(100)}
+                            />
+                            Thanh toán hết
+                          </label>
                         </div>
-                        <button
-                          className="btn-payment"
-                          onClick={() => console.log("payment")}
-                        >
-                          Thanh toán <ArrowRightIcon />
-                        </button>
-                      </div>
+                      )}
                     </div>
                   </div>
-                )}
-            </div>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Sân</th>
-                    {timeSlots.map((time) => (
-                      <th key={time}>{time}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {priceData?.map((field) => (
-                    <tr key={field.fieldId}>
-                      <td>{field.fieldName}</td>
-                      {renderCells(field.fieldName, field.unit)}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                  <div className="must-payment">
+                    <span className="title">Số tiền phải trả</span>
+                    <span className="price">
+                      {(
+                        popupInfo?.totalPrice *
+                        1000 *
+                        (paymentMethod / 100 || 1)
+                      ).toLocaleString("vi-VN")}{" "}
+                      đ
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        {/* {isPopupOpen && (
+      </ScheduleContainer>
+    );
+  };
+  console.log(selectedSlots, 555);
+  return isBooking
+    ? stadium && <Payment />
+    : stadium && (
+        <ScheduleContainer className="schedule-container">
+          <div className="header">
+            <div className="title">
+              <button className="close-btn" onClick={() => navigate(-1)}>
+                <ArrowLeftIcon />
+                Quay lại
+              </button>
+              <h3 className="name">Lịch sân - {stadium.name}</h3>
+            </div>
+            <button
+              className="fixed-booking"
+              onClick={() => console.log(selectedSlots)}
+            >
+              Đặt lịch cố định
+            </button>
+          </div>
+          <div className="content-container">
+            <div className="content">
+              <div className="content-header">
+                <DateTimePicker
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  setDayOfWeek={setDayOfWeek}
+                />
+                <div className="unit-status">
+                  <div className="unit-item">
+                    <div className="color white"></div>
+                    <span className="text-status">Đang trống</span>
+                  </div>
+                  <div className="unit-item">
+                    <div className="color green"></div>
+                    <span className="text-status">Đang chọn</span>
+                  </div>
+                  <div className="unit-item">
+                    <div className="color grey"></div>
+                    <span className="text-status">Khóa</span>
+                  </div>
+                  <div className="unit-item">
+                    <div className="color red"></div>
+                    <span className="text-status">Đã đặt</span>
+                  </div>
+                </div>
+                {popupInfo &&
+                  selectedSlots &&
+                  Object.keys(selectedSlots).length > 0 && (
+                    <div className="popup-order-overlay">
+                      <div className="popup-order-content">
+                        <div className="info">
+                          <span>Thời gian đã chọn: </span>
+                          <div className="orders">
+                            {popupInfo.groupedData.map((group, index) => (
+                              <div key={index}>
+                                <ul>
+                                  {group.times
+                                    .map(
+                                      (time, idx) =>
+                                        `${time.start} - ${time.end}`,
+                                    )
+                                    .join(", ")}
+                                </ul>
+                                {`(${group.name})`}
+                                {index < popupInfo.groupedData.length - 1 &&
+                                  ", "}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="payment">
+                          <div className="total-price">
+                            <span className="title">Tổng tiền:</span>
+                            <span className="price">
+                              {popupInfo.totalPrice}k
+                            </span>
+                          </div>
+                          <button
+                            className="btn-payment"
+                            onClick={handlePayment}
+                          >
+                            Thanh toán <ArrowRightIcon />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+              </div>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sân</th>
+                      {timeSlots.map((time) => (
+                        <th key={time}>{time}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {priceData?.map((field) => (
+                      <tr key={field.fieldId}>
+                        <td>{field.fieldName}</td>
+                        {renderCells(
+                          field.fieldId,
+                          field.fieldName,
+                          field.unit,
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {/* {isPopupOpen && (
           <div className="popup-overlay">
             <div className="popup-content">
               <h3>Đặt lịch cố định</h3>
@@ -422,9 +724,8 @@ const Schedule = () => {
             </div>
           </div>
         )} */}
-      </ScheduleContainer>
-    )
-  );
+        </ScheduleContainer>
+      );
 };
 
 export default Schedule;
