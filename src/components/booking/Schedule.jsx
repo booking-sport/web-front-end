@@ -6,10 +6,14 @@ import {
   NextIcon,
   PrevIcon,
   DeleteIcon,
+  RightWhiteIcon,
+  RightIcon,
 } from "@components/icons/svg";
 import {
   getFieldDetails,
   getPriceDetails,
+  createOrder,
+  getPaymentInfoByStadiumId,
 } from "@components/services/fieldsService";
 import classNames from "classnames";
 import moment from "moment";
@@ -23,11 +27,14 @@ import {
   InputField,
 } from "./StyledSchedule";
 
+import { CloseIcon } from "../icons/svg";
+
 const Schedule = () => {
   const { id } = useParams();
   const [selectedSlots, setSelectedSlots] = useState({});
   const [stadium, setStadium] = useState(null);
   const [priceData, setPriceData] = useState(null);
+  const [paymentInfo, setPaymentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -39,7 +46,6 @@ const Schedule = () => {
   const [fixedBookingData, setFixedBookingData] = useState(null);
   const [isBooking, setIsBooking] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(100);
-  console.log(selectedDate, 222);
   let navigate = useNavigate();
 
   //   const fields = [
@@ -56,7 +62,6 @@ const Schedule = () => {
       .add(i * 30, "minutes")
       .format("HH:mm"),
   );
-  console.log(priceData);
   //   const bookedSlots = {
   //     "Sân thường 1": ["05:00", "05:30", "06:00"],
   //     "Sân thường 2": ["05:00", "05:30"],
@@ -143,6 +148,13 @@ const Schedule = () => {
     );
   };
   useEffect(() => {
+    const resetSlotsAndPopupInfo = () => {
+      setSelectedSlots({});
+      setPopupInfo({});
+    };
+    resetSlotsAndPopupInfo();
+  }, [selectedDate]);
+  useEffect(() => {
     const fetchStadium = async () => {
       try {
         setLoading(true);
@@ -174,6 +186,19 @@ const Schedule = () => {
 
     fetchPrice();
   }, [id, dayOfWeek]);
+  useEffect(() => {
+    const getPaymentInfo = async () => {
+      try {
+        const data = await getPaymentInfoByStadiumId(id);
+        setPaymentInfo(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getPaymentInfo();
+  }, [id]);
   const groupTimeSlotsByField = (slots, selectedSlots, date, fieldNames) => {
     const groupedByField = {};
 
@@ -216,7 +241,6 @@ const Schedule = () => {
             moment(start, "HH:mm"),
             "minutes",
           );
-          console.log(timeDiff, 333);
           return {
             start,
             end,
@@ -248,10 +272,8 @@ const Schedule = () => {
 
   const handleSelect = (field, fieldName, time, price) => {
     const slot = `${field}-${time}`;
-    console.log(slot, 888);
     const updatedSlots = { ...selectedSlots };
     const updatedFieldNames = { ...popupInfo?.fieldNames, [field]: fieldName };
-    console.log(fieldName, 6666);
 
     if (updatedSlots[slot]) {
       delete updatedSlots[slot];
@@ -283,42 +305,45 @@ const Schedule = () => {
     setSelectedSlots(updatedSlots);
   };
   const handleDeleteOrder = (order) => {
-    console.log(
-      "delete:",
-      order.fieldId,
-      order.beginTime.slice(0, -3),
-      order.endTime.slice(0, -3),
+    const updatedFieldNames = popupInfo.fieldNames;
+    const fieldRemove = popupInfo.groupedData.find(
+      (group) => group.field == order.fieldId,
     );
-    const slotKeysToRemove = popupInfo.groupedData
-      .find((group) => group.field === order.fieldId)
-      ?.times.find(
-        (time) =>
-          time.start === order.beginTime.slice(0, -3) &&
-          time.end === order.endTime.slice(0, -3),
-      );
-    console.log(slotKeysToRemove, 3333);
+    const slotKeysToRemove = fieldRemove?.times.find(
+      (time) =>
+        time.start === order.beginTime.slice(0, -3) &&
+        time.end === order.endTime.slice(0, -3),
+    );
     if (!slotKeysToRemove) return;
 
     const updatedSlots = { ...selectedSlots };
-    slotKeysToRemove.forEach((slotKey) => {
+    let currentTime = moment(slotKeysToRemove.start, "HH:mm");
+    const endTime = moment(slotKeysToRemove.end, "HH:mm");
+
+    while (currentTime.isBefore(endTime)) {
+      const slotKey = `${order.fieldId}-${currentTime.format("HH:mm")}`;
       delete updatedSlots[slotKey];
-    });
+      currentTime = currentTime.add(30, "minutes");
+    }
 
     const { groupedData, orders } = groupTimeSlotsByField(
       Object.keys(updatedSlots),
       updatedSlots,
       selectedDate.toLocaleDateString("en-CA"),
+      updatedFieldNames,
     );
 
     const totalPrice = Object.values(updatedSlots).reduce(
       (sum, currentPrice) => sum + currentPrice,
       0,
     );
-
+    const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
     setPopupInfo({
       groupedData,
       totalPrice,
       orders,
+      totalTime,
+      fieldNames: updatedFieldNames,
     });
 
     setSelectedSlots(updatedSlots);
@@ -369,7 +394,6 @@ const Schedule = () => {
   //   const closePopup = () => {
   //     setPopupInfo(null);
   //   };
-  console.log(stadium, 999);
   const handleSaveFixedBooking = (data) => {
     setFixedBookingData(data);
     setIsFixedBooking(true);
@@ -379,9 +403,17 @@ const Schedule = () => {
   };
 
   const Payment = () => {
-    const [userName, setUserName] = useState("");
-    const [userNumber, setUserNumber] = useState("");
+    const savedUser = localStorage.getItem("user");
+    const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+    const [userName, setUserName] = useState(
+      parsedUser ? parsedUser.full_name : "",
+    );
+    const [userNumber, setUserNumber] = useState(
+      parsedUser ? parsedUser.phone_number : "",
+    );
+    const [popupPayment, setPopupPayment] = useState(false);
     const [note, setNote] = useState("");
+    const [isShow, setIsShow] = useState(false);
     const handleUserName = (e) => {
       setUserName(e.target.value);
     };
@@ -391,20 +423,41 @@ const Schedule = () => {
     const handleChangeNote = (e) => {
       setNote(e.target.value);
     };
-    console.log(popupInfo, 1111);
+    const handleShowDetailOrder = () => {
+      setIsShow(!isShow);
+    };
     const formatMinutesToHours = (minutes) => {
       const hours = Math.floor(minutes / 60);
       const remainingMinutes = minutes % 60;
       return `${hours} giờ ${remainingMinutes} phút`;
     };
+    const handlePopupPayment = () => {};
+    const handleClosePopupPayment = () => {
+      setPopupPayment(false);
+    };
+    const handleOrders = async (e) => {
+      e.preventDefault();
+      setPopupPayment(true);
+      const result = await createOrder(
+        stadium.id,
+        popupInfo.orders,
+        note,
+        userName,
+        userNumber,
+      );
+      if (result.data) {
+        console.log(result);
+        alert("Orders successfully created");
+      } else {
+        setError(result.message);
+        console.log(error);
+      }
+    };
+
     return (
       <ScheduleContainer className="payment-container">
         <div className="header">
           <div className="title">
-            <button className="close-btn" onClick={handlePayment}>
-              <ArrowLeftIcon />
-              Quay lại
-            </button>
             <h3 className="name">Đặt sân</h3>
           </div>
         </div>
@@ -465,7 +518,7 @@ const Schedule = () => {
                     </span>
                   </div>
                   {popupInfo?.orders &&
-                    popupInfo?.orders.length > 1 &&
+                    popupInfo?.orders.length > 0 &&
                     popupInfo?.orders.map((order, index) => {
                       return (
                         <div className="order-item" key={index}>
@@ -551,12 +604,152 @@ const Schedule = () => {
                 </div>
               </div>
             </div>
+            <div className="button-actions">
+              <button className="back" onClick={handlePayment}>
+                Quay lại
+              </button>
+              <button className="confirm-payment" onClick={handleOrders}>
+                Xác nhận và thanh toán <RightWhiteIcon />
+              </button>
+            </div>
           </div>
         </div>
+        {popupPayment && (
+          <div className="dialog-container">
+            <div className="dialog">
+              <div className="dialog-header">
+                <span className="title">Thanh toán</span>
+                <button className="close" onClick={handleClosePopupPayment}>
+                  <CloseIcon />
+                </button>
+              </div>
+              <div className="dialog-content">
+                <span className="title">Quét mã QR hoặc nhập thông tin</span>
+                <div className="bank-info">
+                  <img src="/images/test-qr.PNG" alt="" />
+                  <div className="info">
+                    <div className="info-item">
+                      <span className="title">Chủ tài khoản</span>
+                      <span className="value">{paymentInfo.full_name}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="title">Số tài khoản</span>
+                      <span className="value">{paymentInfo.bank_account}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="title">Ngân hàng</span>
+                      <span className="value">{paymentInfo.bank}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="title">Nội dung chuyển khoản</span>
+                      <span className="value">{`<Tên + Số điện thoại>`}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="order-detail">
+                  <div className="title">
+                    Chi tiết đặt
+                    <button
+                      className={isShow ? "show" : ""}
+                      onClick={handleShowDetailOrder}
+                    >
+                      <RightIcon />
+                    </button>
+                  </div>
+                  {isShow && (
+                    <div className="order-detail-content">
+                      <div className="stadium-info">
+                        <div className="stadium-name">
+                          <span className="title">Tên sân:</span>
+                          <span className="value">{stadium.name}</span>
+                        </div>
+                        <div className="stadium-address">
+                          <span className="title">Địa chỉ:</span>
+                          <span className="value">{stadium.address}</span>
+                        </div>
+                      </div>
+                      <div className="order-detail">
+                        <div className="date">
+                          <span className="name-title">Ngày: </span>
+                          <span>
+                            {selectedDate
+                              .toLocaleDateString("sv-SE")
+                              .replace(/-/g, "/")}
+                          </span>
+                        </div>
+                        {popupInfo?.orders &&
+                          popupInfo?.orders.length > 0 &&
+                          popupInfo?.orders.map((order, index) => {
+                            return (
+                              <div className="order-item" key={index}>
+                                <div>
+                                  <span className="title">
+                                    {index + 1}. {order.fieldName}:
+                                  </span>
+                                  <span className="time">
+                                    {order.beginTime} - {order.endTime}
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="price">
+                                    {(order.price * 1000).toLocaleString(
+                                      "vi-VN",
+                                    )}{" "}
+                                    đ
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="price-info">
+                  <div className="total-price">
+                    <span className="title">Thành tiền</span>
+                    <span className="value">
+                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                  <div className="deposit">
+                    <span className="title">Cọc trước</span>
+                    <span className="value">
+                      {(
+                        popupInfo?.totalPrice *
+                        1000 *
+                        (paymentMethod / 100 || 1)
+                      ).toLocaleString("vi-VN")}{" "}
+                      đ
+                    </span>
+                  </div>
+                </div>
+                <div className="message">
+                  Vui lòng chuyển khoản{" "}
+                  <strong>
+                    {(
+                      popupInfo?.totalPrice *
+                      1000 *
+                      (paymentMethod / 100 || 1)
+                    ).toLocaleString("vi-VN")}{" "}
+                  </strong>
+                  đ trong vòng <strong>10 phút</strong> để hoàn tất đặt lịch!
+                  <br />
+                  Đơn hàng của bạn còn được giữ chỗ trong:
+                  <br />
+                  <span className="time">05:32</span>
+                </div>
+              </div>
+              {/* <div className="dialog-footer">
+                <button className="cancel">Hủy bỏ</button>
+                <button className="confirm">Xác nhận đã chuyển khoản</button>
+              </div> */}
+            </div>
+          </div>
+        )}
       </ScheduleContainer>
     );
   };
-  console.log(selectedSlots, 555);
   return isBooking
     ? stadium && <Payment />
     : stadium && (

@@ -1597,3 +1597,51 @@ export const DeleteIcon = (props) => {
     </svg>
   );
 };
+export const RightWhiteIcon = (props) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M2.01367 11.9848C2.01367 11.4338 2.46067 10.9878 3.01167 10.9878L18.5757 10.9978L15.6077 7.9978L17.0137 6.5918L21.7327 11.2788C22.1227 11.6698 22.1227 12.3258 21.7327 12.7168L17.0137 17.4038L15.6077 15.9978L18.5757 12.9978L3.01167 12.9828C2.46067 12.9828 2.01367 12.5358 2.01367 11.9848Z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+export const CloseIcon = (props) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+        fill="#6C737F"
+      />
+    </svg>
+  );
+};
+export const RightIcon = (props) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M9.70492 6L8.29492 7.41L12.8749 12L8.29492 16.59L9.70492 18L15.7049 12L9.70492 6Z"
+        fill="#6C737F"
+      />
+    </svg>
+  );
+};

@@ -8,7 +8,7 @@ import {
   ArrowLeftIcon,
 } from "@components/icons/svg";
 
-import { login } from "@components/services/auth";
+import { login, register } from "@components/services/auth";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 // Styled Component
@@ -79,6 +79,18 @@ const FormContent = styled.form`
   display: flex;
   flex-direction: column;
   gap: 16px;
+`;
+const ErrorMessage = styled.p`
+  color: var(--error-main, #f04438);
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  /* Typography/Subtitle 2 */
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 157%;
 `;
 const FormTitle = styled.p`
   margin: 0;
@@ -251,6 +263,7 @@ const Login = ({ onLoginSuccess }) => {
     const handleSubmit = async (e) => {
       e.preventDefault();
       const result = await login(username, password);
+      console.log(result);
       if (result.success) {
         onLoginSuccess(result.user);
         window.location.href = "/";
@@ -270,6 +283,7 @@ const Login = ({ onLoginSuccess }) => {
           </FormSubTitle>
         </FormHeader>
         <FormContent onSubmit={handleSubmit}>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <InputFieldContainer>
             <TitleField>Nhập số điện thoại hoặc email</TitleField>
             <InputField
@@ -299,22 +313,68 @@ const Login = ({ onLoginSuccess }) => {
   };
   const RegisterForm = () => {
     const [password, setPassword] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [userName, setUserName] = useState("");
+    const [fullName, setFullName] = useState("");
     const [rePassword, setRePassword] = useState("");
     const [isHidden, setIsHidden] = useState(true);
     const [isRePassHidden, setIsRePassHidden] = useState(true);
+    const [error, setError] = useState("");
 
-    const toggleVisibility = () => {
-      setIsHidden(!isHidden);
-    };
-    const toggleRePassVisibility = () => {
-      setIsRePassHidden(!isRePassHidden);
-    };
+    const toggleVisibility = () => setIsHidden(!isHidden);
+    const toggleRePassVisibility = () => setIsRePassHidden(!isRePassHidden);
 
-    const handleChange = (e) => {
-      setPassword(e.target.value);
+    const handleChange = (e) => setPassword(e.target.value);
+    const handleRePassChange = (e) => setRePassword(e.target.value);
+    const handleEmailChange = (e) => setUserName(e.target.value);
+    const handlePhoneNumberChange = (e) => setPhoneNumber(e.target.value);
+    const handleFullNameChange = (e) => setFullName(e.target.value);
+
+    const validateForm = () => {
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userName)) {
+        return "Email không hợp lệ.";
+      }
+
+      // Phone number validation
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(phoneNumber)) {
+        return "Số điện thoại phải là 10 chữ số.";
+      }
+
+      // Full name validation
+      if (fullName.trim().length < 2) {
+        return "Họ và tên phải có ít nhất 2 ký tự.";
+      }
+
+      // Password validation
+      const passwordRegex =
+        /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt.";
+      }
+
+      // Password match
+      if (password !== rePassword) {
+        return "Mật khẩu không khớp.";
+      }
+
+      return null; // No errors
     };
-    const handleRePassChange = (e) => {
-      setRePassword(e.target.value);
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const validationError = validateForm();
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+      const result = await register(userName, password, phoneNumber, fullName);
+      if (result.success) {
+        window.location.reload();
+      } else {
+        setError(result.message);
+      }
     };
     return (
       <FormContainer>
@@ -331,17 +391,31 @@ const Login = ({ onLoginSuccess }) => {
             </LinkToRegister>
           </FormSubTitle>
         </FormHeader>
-        <FormContent>
+        <FormContent onSubmit={handleSubmit}>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <InputFieldContainer>
-            <TitleField>Nhập số điện thoại hoặc email</TitleField>
+            <TitleField>Nhập email</TitleField>
             <InputField
-              placeholder="Nhập số điện thoại hoặc email"
+              placeholder="Nhập email"
               type="text"
+              onChange={handleEmailChange}
+            />
+          </InputFieldContainer>
+          <InputFieldContainer>
+            <TitleField>Nhập số điện thoại </TitleField>
+            <InputField
+              placeholder="Nhập số điện thoại "
+              type="text"
+              onChange={handlePhoneNumberChange}
             />
           </InputFieldContainer>
           <InputFieldContainer>
             <TitleField>Họ và tên</TitleField>
-            <InputField placeholder="Nhập họ và tên" type="text" />
+            <InputField
+              placeholder="Nhập họ và tên"
+              type="text"
+              onChange={handleFullNameChange}
+            />
           </InputFieldContainer>
           <InputFieldContainer>
             <TitleField>Mật khẩu</TitleField>
@@ -369,7 +443,7 @@ const Login = ({ onLoginSuccess }) => {
               <EyeIcon />
             </ShowButton>
           </InputFieldContainer>
-          <LoginButton>Đăng ký</LoginButton>
+          <LoginButton type="submit">Đăng ký</LoginButton>
         </FormContent>
       </FormContainer>
     );
