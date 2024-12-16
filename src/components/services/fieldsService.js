@@ -35,14 +35,29 @@ export const getPriceDetails = async (id, day, date) => {
   }
 };
 
-// Hàm để tạo sân mới (nếu cần)
-export const createField = async (fieldData) => {
+export const createOrder = async (id, orders, note, userName, userNumber) => {
   try {
-    const response = await apiClient.post("/sports-fields", fieldData);
+    const response = await apiClient.post(`/orders/stadium/${id}`, {
+      orders: orders,
+      note: note,
+      fullName: userName,
+      phoneNumber: userNumber,
+    });
     return response.data;
   } catch (error) {
     console.error("Error creating field:", error);
     throw error;
   }
 };
+
+export const getPaymentInfoByStadiumId = async (id) => {
+  try {
+    const response = await apiClient.get(`/stadiums/${id}/payment-info`);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating field:", error);
+    throw error;
+  }
+};
+
 
