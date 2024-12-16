@@ -7,6 +7,8 @@ export const ScheduleContainer = styled.div`
     justify-content: space-between;
     gap: 8px;
     padding: 24px;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.08);
     .title {
       display: flex;
       flex-direction: column;
@@ -297,6 +299,267 @@ export const ScheduleContainer = styled.div`
   }
   &.schedule-container {
   }
+  &.payment-container {
+    .content-container {
+      .content {
+        max-width: 920px;
+        margin: 0 auto;
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        background-color: transparent;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        .content-header {
+          justify-content: flex-start;
+          align-items: flex-start;
+          border-radius: 16px;
+          border: 1px solid var(--divider, #d6d6e1);
+          box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+          overflow: hidden;
+          background: var(--background-paper, #fff);
+          padding: 20px;
+          .title {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/H6 */
+            font-family: "Plus Jakarta Sans";
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%;
+            margin-bottom: 20px;
+          }
+          .info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            .name-number {
+              display: flex;
+              gap: 12px;
+              > div {
+                flex: 1;
+              }
+            }
+          }
+        }
+        .content-info {
+          border-radius: 16px;
+          border: 1px solid var(--divider, #d6d6e1);
+          box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+          overflow: hidden;
+          background: var(--background-paper, #fff);
+          padding: 20px;
+          .title {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/H6 */
+            font-family: "Plus Jakarta Sans";
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%;
+            margin-bottom: 20px;
+          }
+          .info {
+            .stadium,
+            .address {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/Subtitle 1 */
+              font-family: Inter;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 157%;
+              display: flex;
+              gap: 5px;
+              margin-bottom: 8px;
+              .name-title {
+                color: var(--text-secondary, #4d5761);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Subtitle 1 */
+                font-family: Inter;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+              }
+            }
+            .detail-info {
+              border-radius: 12px;
+              background: var(--primary-selected, rgba(29, 154, 108, 0.08));
+              padding: 16px;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              .date {
+                color: var(--text-primary, #111927);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Subtitle 1 */
+                font-family: Inter;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+                display: flex;
+                gap: 5px;
+                .name-title {
+                  color: var(--text-secondary, #4d5761);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/Body 1 */
+                  font-family: Inter;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 400;
+                  line-height: 150%;
+                }
+              }
+              .order-item {
+                display: flex;
+                justify-content: space-between;
+                > div {
+                  display: flex;
+                  gap: 5px;
+                  .title {
+                    color: var(--text-secondary, #4d5761);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Body 2 */
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 157%;
+                    margin: 0;
+                  }
+                  .time {
+                    color: var(--text-primary, #111927);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Subtitle 2 */
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 157%;
+                    margin: 0;
+                  }
+                  .price {
+                    color: var(--error-main, #f04438);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Subtitle 2 */
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 157%;
+                  }
+                  .delete {
+                    padding: 0;
+                  }
+                }
+              }
+            }
+            .line {
+              margin: 12px 0;
+              height: 1px;
+              width: 100%;
+              background: #dfe4ec;
+            }
+            .overview {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              .title {
+                color: var(--text-secondary, #4d5761);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                font-family: Inter;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+                margin: 0;
+              }
+              .total-time {
+                color: var(--text-primary, #111927);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Subtitle 1 */
+                font-family: Inter;
+                font-size: 16px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+              }
+              .total-price {
+                color: var(--text-primary, #111927);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/H6 */
+                font-family: "Plus Jakarta Sans";
+                font-size: 18px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 120%;
+              }
+              .payment-method {
+                color: var(--text-primary, #111927);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Caption */
+                font-family: Inter;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 166%;
+              }
+              .must-payment {
+                color: var(--error-main, #f04438);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/H5 */
+                font-family: "Plus Jakarta Sans";
+                font-size: 24px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 120%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   .table-container {
     overflow-x: auto;
@@ -358,4 +621,44 @@ export const ScheduleContainer = styled.div`
     border-bottom: none;
     border-right: none;
   }
+`;
+
+export const TitleField = styled.span`
+  color: var(--text-secondary, #4d5761);
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  /* Components/Input Label */
+  font-family: Inter;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 12px; /* 109.091% */
+  letter-spacing: 0.15px;
+  position: absolute;
+  top: 9px;
+  left: 12px;
+`;
+export const InputFieldContainer = styled.div`
+  padding: 24px 12px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--divider, #dfe4ec);
+  position: relative;
+  display: flex;
+`;
+export const InputField = styled.input`
+  color: var(--text-primary, #111927);
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  /* Components/Input Text */
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px; /* 171.429% */
+  letter-spacing: 0.15px;
+  width: 100%;
+  border: 0;
+  outline: none;
 `;
