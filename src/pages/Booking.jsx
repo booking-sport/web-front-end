@@ -1,19 +1,19 @@
 import React from "react";
 import styled from "styled-components";
 import Header from "@components/header/Header";
-import Map from "@components/map/Map";
+import Schedule from "@components/booking/Schedule";
 // Styled Component
 const Container = styled.div`
   overflow: auto;
 `;
 
-const Home = ({ user }) => {
+const Booking = ({ user }) => {
   return (
     <Container>
       <Header user={user} />
-      <Map />
+      <Schedule />
     </Container>
   );
 };
 
-export default Home;
+export default Booking;
