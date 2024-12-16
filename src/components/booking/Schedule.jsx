@@ -18,7 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ScheduleContainer } from "./StyledSchedule";
 const Schedule = () => {
   const { id } = useParams();
-  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [selectedSlots, setSelectedSlots] = useState({});
   const [stadium, setStadium] = useState(null);
   const [priceData, setPriceData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,37 +28,38 @@ const Schedule = () => {
     moment().format("dddd").toLowerCase(),
   );
   const [popupInfo, setPopupInfo] = useState(null);
+  const [isFixedBooking, setIsFixedBooking] = useState(false);
+  const [fixedBookingData, setFixedBookingData] = useState(null);
   let navigate = useNavigate();
 
-  // Dữ liệu các sân
-  const fields = [
-    "Sân thường 1",
-    "Sân thường 2",
-    "Sân thường 3",
-    "Sân lớn 1",
-    "Sân lớn 2",
-    "Sân lớn 3",
-  ];
+  //   const fields = [
+  //     "Sân thường 1",
+  //     "Sân thường 2",
+  //     "Sân thường 3",
+  //     "Sân lớn 1",
+  //     "Sân lớn 2",
+  //     "Sân lớn 3",
+  //   ];
 
-  // Tạo thời gian từ 5:00 đến 13:00 với step 30 phút
   const timeSlots = Array.from({ length: 48 }, (_, i) =>
     moment("00:00", "HH:mm")
       .add(i * 30, "minutes")
       .format("HH:mm"),
   );
 
-  // Trạng thái các ô (mô phỏng)
-  const bookedSlots = {
-    "Sân thường 1": ["05:00", "05:30", "06:00"],
-    "Sân thường 2": ["05:00", "05:30"],
-    "Sân thường 3": ["06:00"],
-    "Sân lớn 1": ["09:30", "10:00"],
-    "Sân lớn 2": ["12:00", "12:30", "13:00"],
-    "Sân lớn 3": [],
-  };
+  //   const bookedSlots = {
+  //     "Sân thường 1": ["05:00", "05:30", "06:00"],
+  //     "Sân thường 2": ["05:00", "05:30"],
+  //     "Sân thường 3": ["06:00"],
+  //     "Sân lớn 1": ["09:30", "10:00"],
+  //     "Sân lớn 2": ["12:00", "12:30", "13:00"],
+  //     "Sân lớn 3": [],
+  //   };
   const DateTimePicker = ({ selectedDate, setSelectedDate, setDayOfWeek }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const today = moment().startOf("day").toDate();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7);
     const openPopup = () => {
       setIsPopupOpen(!isPopupOpen);
     };
@@ -74,8 +75,10 @@ const Schedule = () => {
     };
     const handleNextDay = () => {
       const nextDate = moment(selectedDate).add(1, "days").toDate();
-      setSelectedDate(nextDate);
-      setDayOfWeek(moment(nextDate).format("dddd").toLowerCase());
+      if (nextDate <= maxDate) {
+        setSelectedDate(nextDate);
+        setDayOfWeek(moment(nextDate).format("dddd").toLowerCase());
+      }
     };
 
     const handlePrevDay = () => {
@@ -86,7 +89,6 @@ const Schedule = () => {
       }
     };
 
-    console.log(selectedDate);
     return (
       <div className="date-time">
         {isPopupOpen && (
@@ -97,6 +99,7 @@ const Schedule = () => {
                 onChange={handleDateChange}
                 dateFormat="dd/MM/yyyy"
                 minDate={today}
+                maxDate={maxDate}
                 inline
               />
             </div>
@@ -118,7 +121,11 @@ const Schedule = () => {
               </p>
             </button>
           </div>
-          <button className="btn-next" onClick={handleNextDay}>
+          <button
+            className="btn-next"
+            onClick={handleNextDay}
+            disabled={selectedDate >= maxDate}
+          >
             <NextIcon />
           </button>
         </div>
@@ -142,10 +149,11 @@ const Schedule = () => {
   }, [id]);
 
   useEffect(() => {
+    const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
     const fetchPrice = async () => {
       try {
         setLoading(true);
-        const data = await getPriceDetails(id, dayOfWeek);
+        const data = await getPriceDetails(id, dayOfWeek, formattedDate);
         setPriceData(data?.data);
       } catch (err) {
         setError(err.message);
@@ -199,44 +207,62 @@ const Schedule = () => {
     return result;
   };
 
-  // Xử lý chọn slot
   const handleSelect = (field, time, price) => {
     const slot = `${field}-${time}`;
-    const newSlots = selectedSlots.includes(slot)
-      ? selectedSlots.filter((item) => item !== slot)
-      : [...selectedSlots, slot];
+    const updatedSlots = { ...selectedSlots };
 
-    const groupedData = groupTimeSlotsByField(newSlots);
+    if (updatedSlots[slot]) {
+      delete updatedSlots[slot];
+    } else {
+      updatedSlots[slot] = price;
+    }
+    const groupedData = groupTimeSlotsByField(Object.keys(updatedSlots));
 
-    const totalPrice = newSlots.length * price;
+    const totalPrice = Object.values(updatedSlots).reduce(
+      (sum, currentPrice) => sum + currentPrice,
+      0,
+    );
 
     setPopupInfo({
       groupedData,
       totalPrice,
     });
 
-    setSelectedSlots(newSlots);
+    setSelectedSlots(updatedSlots);
   };
 
   const renderCells = (fieldName, unitPrices) =>
     timeSlots.map((time, index) => {
-      const isSelected = selectedSlots.includes(`${fieldName}-${time}`);
-      const price = unitPrices[index];
+      const slotKey = `${fieldName}-${time}`;
+      const isSelected = selectedSlots[slotKey];
+      const unitPrice = unitPrices[index];
+      const price = unitPrice?.price;
+      const status = unitPrice?.status;
       return (
         <td
           key={time}
           className={classNames("cell", {
             selected: isSelected,
+            block: status === "block",
+            booked: status === "booked",
           })}
-          onClick={() => handleSelect(fieldName, time, price)}
+          onClick={() => {
+            if (status === "available") {
+              handleSelect(fieldName, time, price);
+            }
+          }}
         ></td>
       );
     });
+
   //   const closePopup = () => {
   //     setPopupInfo(null);
   //   };
-
-  console.log(stadium, 999);
+  console.log(popupInfo, 999);
+  const handleSaveFixedBooking = (data) => {
+    setFixedBookingData(data);
+    setIsFixedBooking(true);
+  };
   return (
     stadium && (
       <ScheduleContainer className="schedule-container">
@@ -281,42 +307,45 @@ const Schedule = () => {
                   <span className="text-status">Đã đặt</span>
                 </div>
               </div>
-              {popupInfo && (
-                <div className="popup-order-overlay">
-                  <div className="popup-order-content">
-                    <div className="info">
-                      <span>Thời gian đã chọn: </span>
-                      <div className="orders">
-                        {popupInfo.groupedData.map((group, index) => (
-                          <div key={index}>
-                            <ul>
-                              {group.times
-                                .map(
-                                  (time, idx) => `${time.start} - ${time.end}`,
-                                )
-                                .join(", ")}
-                            </ul>
-                            {`(${group.field})`}
-                            {index < popupInfo.groupedData.length - 1 && ", "}
-                          </div>
-                        ))}
+              {popupInfo &&
+                selectedSlots &&
+                Object.keys(selectedSlots).length > 0 && (
+                  <div className="popup-order-overlay">
+                    <div className="popup-order-content">
+                      <div className="info">
+                        <span>Thời gian đã chọn: </span>
+                        <div className="orders">
+                          {popupInfo.groupedData.map((group, index) => (
+                            <div key={index}>
+                              <ul>
+                                {group.times
+                                  .map(
+                                    (time, idx) =>
+                                      `${time.start} - ${time.end}`,
+                                  )
+                                  .join(", ")}
+                              </ul>
+                              {`(${group.field})`}
+                              {index < popupInfo.groupedData.length - 1 && ", "}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <div className="payment">
-                      <div className="total-price">
-                        <span className="title">Tổng tiền:</span>
-                        <span className="price">{popupInfo.totalPrice}k</span>
+                      <div className="payment">
+                        <div className="total-price">
+                          <span className="title">Tổng tiền:</span>
+                          <span className="price">{popupInfo.totalPrice}k</span>
+                        </div>
+                        <button
+                          className="btn-payment"
+                          onClick={() => console.log("payment")}
+                        >
+                          Thanh toán <ArrowRightIcon />
+                        </button>
                       </div>
-                      <button
-                        className="btn-payment"
-                        onClick={() => console.log("payment")}
-                      >
-                        Thanh toán <ArrowRightIcon />
-                      </button>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
             <div className="table-container">
               <table>
@@ -332,7 +361,7 @@ const Schedule = () => {
                   {priceData?.map((field) => (
                     <tr key={field.fieldId}>
                       <td>{field.fieldName}</td>
-                      {renderCells(field.fieldName, field.unitPrice)}
+                      {renderCells(field.fieldName, field.unit)}
                     </tr>
                   ))}
                 </tbody>
@@ -340,6 +369,59 @@ const Schedule = () => {
             </div>
           </div>
         </div>
+        {/* {isPopupOpen && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h3>Đặt lịch cố định</h3>
+              <div>
+                <label>Chọn khoảng thời gian cố định:</label>
+                <div className="time-options">
+                  <label>
+                    <input type="radio" name="duration" value="1" /> 1 tháng
+                  </label>
+                  <label>
+                    <input type="radio" name="duration" value="6" /> 6 tháng
+                  </label>
+                  <label>
+                    <input type="radio" name="duration" value="12" /> 1 năm
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label>Thời gian:</label>
+                <div>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                  />
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => setEndDate(date)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label>Ghi chú:</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Nhập ghi chú"
+                />
+              </div>
+              <div className="actions">
+                <button onClick={closePopup}>Hủy</button>
+                <button
+                  onClick={() => {
+                    handleSaveFixedBooking({ startDate, endDate, note });
+                    closePopup();
+                  }}
+                >
+                  Lưu cài đặt
+                </button>
+              </div>
+            </div>
+          </div>
+        )} */}
       </ScheduleContainer>
     )
   );

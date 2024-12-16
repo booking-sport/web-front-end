@@ -300,11 +300,11 @@ export const ScheduleContainer = styled.div`
 
   .table-container {
     overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
+    // -ms-overflow-style: none;
+    // scrollbar-width: none;
+    // &::-webkit-scrollbar {
+    //   display: none;
+    // }
   }
 
   table {
@@ -323,7 +323,11 @@ export const ScheduleContainer = styled.div`
   .cell {
     background-color: #fff;
   }
-
+  .cell.block {
+    background-color: rgba(17, 25, 39, 0.12);
+    color: #fff;
+    cursor: not-allowed;
+  }
   .cell.booked {
     background-color: #f04438;
     color: #fff;

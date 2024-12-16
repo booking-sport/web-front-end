@@ -23,10 +23,10 @@ export const getFieldDetails = async (id) => {
     throw error;
   }
 };
-export const getPriceDetails = async (id, day) => {
+export const getPriceDetails = async (id, day, date) => {
   try {
     const response = await apiClient.get(
-      `/price/detail/${id}?dayOfWeek=${day}`,
+      `/price/detail/${id}?dayOfWeek=${day}&date=${date}`,
     );
     return response.data;
   } catch (error) {
@@ -45,3 +45,4 @@ export const createField = async (fieldData) => {
     throw error;
   }
 };
+

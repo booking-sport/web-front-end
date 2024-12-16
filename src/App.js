@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Cookies from "js-cookie";
 import { ThemeProvider } from "styled-components";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -15,14 +16,35 @@ const theme = {
 };
 
 const App = () => {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const jwt = Cookies.get("jwt");
+    const savedUser = localStorage.getItem("user");
+    if (savedUser && !jwt) {
+      localStorage.removeItem("user");
+      setUser(null);
+    } else if (savedUser && jwt) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+  const handleLoginSuccess = (user) => {
+    setUser(user);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/list-stadium" element={<ListStadium />} />
-          <Route path="/booking/:id" element={<Booking />} />
+          <Route path="/" element={<Home user={user} />} />
+          <Route
+            path="/login"
+            element={<Login onLoginSuccess={handleLoginSuccess} />}
+          />
+          <Route path="/list-stadium" element={<ListStadium user={user} />} />
+          <Route path="/booking/:id" element={<Booking user={user} />} />
         </Routes>
       </Router>
     </ThemeProvider>

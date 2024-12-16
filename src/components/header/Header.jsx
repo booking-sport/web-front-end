@@ -21,11 +21,19 @@ import {
   MobileNavToggle,
   MobileNavOverlay,
 } from "./StyledHeader";
-const Header = () => {
+import { logout } from "@components/services/auth";
+const Header = ({ user }) => {
   const location = useLocation();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
-
+  const [showLogout, setShowLogout] = useState(false);
+  const [error, setError] = useState("");
+  const handleShowLogout = () => {
+    setShowLogout(!showLogout);
+  };
+  const handleLogout = async (e) => {
+    await logout();
+  };
   const Logo = () => {
     return (
       <LogoContainer>
@@ -80,10 +88,22 @@ const Header = () => {
   const AccountManager = () => {
     return (
       <AccountManagerContainer>
-        <Link to={"/account"}>
-          <AccountImage src="/icons/Avatar.svg" />
-          <Name>Nguyeexn Dinh Dat</Name>
-        </Link>
+        {user ? (
+          <Link onClick={handleShowLogout} id="showLogout" to={"#"}>
+            <AccountImage src="/icons/Avatar.svg" />
+            <Name>{user.full_name}</Name>
+          </Link>
+        ) : (
+          <Link to={"/login"}>
+            <AccountImage src="/icons/Avatar.svg" />
+            <Name>Đăng nhập</Name>
+          </Link>
+        )}
+        {showLogout && (
+          <div className="logout-container" onClick={handleLogout}>
+            Đăng xuất
+          </div>
+        )}
       </AccountManagerContainer>
     );
   };

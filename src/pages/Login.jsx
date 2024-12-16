@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   TitleIcon,
@@ -7,6 +7,10 @@ import {
   GoogleIcon,
   ArrowLeftIcon,
 } from "@components/icons/svg";
+
+import { login } from "@components/services/auth";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 // Styled Component
 const Wrapper = styled.div`
   background-color: #fff;
@@ -71,7 +75,7 @@ const FormContainer = styled.div`
   gap: 16px;
 `;
 const FormHeader = styled.div``;
-const FormContent = styled.div`
+const FormContent = styled.form`
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -209,8 +213,18 @@ const ButtonBack = styled.button`
   outline: none;
   width: fit-content;
 `;
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const jwt = Cookies.get("jwt");
+    const savedUser = localStorage.getItem("user");
+    if (savedUser && !jwt) {
+      localStorage.removeItem("user");
+    } else if (savedUser && jwt) {
+      navigate("/");
+    }
+  }, [navigate]);
   const handleClickLogin = () => {
     setIsLogin(true);
   };
@@ -219,15 +233,30 @@ const Login = () => {
   };
 
   const LoginForm = () => {
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isHidden, setIsHidden] = useState(true);
-
+    const [error, setError] = useState("");
     const toggleVisibility = () => {
       setIsHidden(!isHidden);
     };
 
-    const handleChange = (e) => {
+    const handleChangePassword = (e) => {
       setPassword(e.target.value);
+    };
+    const handleChangeEmail = (e) => {
+      setUsername(e.target.value);
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      const result = await login(username, password);
+      if (result.success) {
+        onLoginSuccess(result.user);
+        window.location.href = "/";
+      } else {
+        setError(result.message);
+      }
     };
     return (
       <FormContainer>
@@ -240,12 +269,13 @@ const Login = () => {
             </LinkToRegister>
           </FormSubTitle>
         </FormHeader>
-        <FormContent>
+        <FormContent onSubmit={handleSubmit}>
           <InputFieldContainer>
             <TitleField>Nhập số điện thoại hoặc email</TitleField>
             <InputField
               placeholder="Nhập số điện thoại hoặc email"
               type="text"
+              onChange={handleChangeEmail}
             />
           </InputFieldContainer>
           <InputFieldContainer>
@@ -253,7 +283,7 @@ const Login = () => {
             <InputField
               placeholder="Mật khẩu"
               type={isHidden ? "password" : "text"}
-              onChange={handleChange}
+              onChange={handleChangePassword}
               id="password"
               value={password}
             />
@@ -261,7 +291,7 @@ const Login = () => {
               <EyeIcon />
             </ShowButton>
           </InputFieldContainer>
-          <LoginButton>Đăng nhập</LoginButton>
+          <LoginButton type="submit">Đăng nhập</LoginButton>
           <ForgetPass>Quên mật khẩu?</ForgetPass>
         </FormContent>
       </FormContainer>

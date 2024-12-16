@@ -4,10 +4,10 @@ import React from "react";
 import styled from "styled-components";
 // Styled Component
 const Container = styled.div``;
-const ListStadium = () => {
+const ListStadium = ({ user }) => {
   return (
     <Container>
-      <Header />
+      <Header user={user} />
       <ListContent />
     </Container>
   );

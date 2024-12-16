@@ -7,10 +7,10 @@ const Container = styled.div`
   overflow: auto;
 `;
 
-const Booking = () => {
+const Booking = ({ user }) => {
   return (
     <Container>
-      <Header />
+      <Header user={user} />
       <Schedule />
     </Container>
   );

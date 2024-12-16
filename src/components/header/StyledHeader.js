@@ -18,6 +18,7 @@ export const HeaderContainer = styled.div`
 `;
 
 export const AccountManagerContainer = styled.div`
+  position: relative;
   > a {
     display: flex;
     gap: 8px;
@@ -33,6 +34,27 @@ export const AccountManagerContainer = styled.div`
     font-weight: 500;
     line-height: 157%;
     text-decoration: none;
+    position: relative;
+  }
+  .logout-container {
+    position: absolute;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
+    top: 100%;
+    right: 0;
+    color: var(--text-primary, #111927);
+    font-feature-settings:
+      "liga" off,
+      "clig" off;
+    /* Typography/Subtitle 2 */
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 157%;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 1000;
   }
 `;
 export const AccountImage = styled.img`

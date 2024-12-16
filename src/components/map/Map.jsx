@@ -430,8 +430,7 @@ const Map = () => {
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
-      style:
-        "https://api.maptiler.com/maps/streets/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
       center: [105.801944, 21.005273],
       zoom: 10,
     });
