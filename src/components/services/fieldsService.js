@@ -59,5 +59,47 @@ export const getPaymentInfoByStadiumId = async (id) => {
     throw error;
   }
 };
+export const getUserInfoById = async (id) => {
+  try {
+    const response = await apiClient.get(`/players/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetch data:", error);
+    throw error;
+  }
+};
 
-
+export const editNumberById = async (id, phoneNumber) => {
+  try {
+    const response = await apiClient.put(`/players/${id}/`, {
+      phoneNumber: phoneNumber,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error change number:", error);
+    throw error;
+  }
+};
+export const editPasswordById = async (id, oldPassword, newPassword) => {
+  try {
+    const response = await apiClient.put(`/players/${id}/`, {
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error change password:", error);
+    throw error;
+  }
+};
+export const editNameById = async (id, fullName) => {
+  try {
+    const response = await apiClient.put(`/players/${id}/`, {
+      fullName: fullName,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error change name:", error);
+    throw error;
+  }
+};
