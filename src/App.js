@@ -22,7 +22,7 @@ const App = () => {
     const jwt = Cookies.get("jwt");
     const savedUser = localStorage.getItem("user");
     if (savedUser && !jwt) {
-      localStorage.removeItem("user");
+     localStorage.setItem("user", JSON.stringify(null));
       setUser(null);
     } else if (savedUser && jwt) {
       setUser(JSON.parse(savedUser));

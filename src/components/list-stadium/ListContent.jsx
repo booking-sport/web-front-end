@@ -58,7 +58,6 @@ const ListContent = () => {
     };
     fetchFields();
   }, []);
-  console.log(fields, 99);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [step, setStep] = useState(1);

@@ -1074,3 +1074,145 @@ export const InputField = styled.input`
   border: 0;
   outline: none;
 `;
+export const FixedSettingPopup = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 11;
+  .popup-content {
+    border-radius: 20px;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 9px 46px 0px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 704px;
+    position: relative;
+    padding: 29px 24px;
+    .btn-close {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+    }
+    h3.title {
+      color: var(--text-primary, #111927);
+      font-feature-settings:
+        "liga" off,
+        "clig" off;
+      /* Typography/H6 */
+      font-family: "Plus Jakarta Sans";
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 120%;
+    }
+    .select-duration {
+      margin: 16px 0;
+      label {
+        color: var(--text-primary, #111927);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Components/Input Text */
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 171.429% */
+        letter-spacing: 0.15px;
+      }
+      .time-options {
+        display: flex;
+        gap: 32px;
+        .time-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          input {
+            margin: 0;
+          }
+        }
+      }
+    }
+    .select-time {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      label {
+        color: var(--text-primary, #111927);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Components/Input Text */
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px; /* 171.429% */
+        letter-spacing: 0.15px;
+      }
+      .time-container {
+        display: flex;
+        gap: 12px;
+        > div {
+          flex: 1;
+          .react-datepicker-wrapper {
+            width: 100%;
+            input {
+              width: 100%;
+              border: 0;
+              background-color: transparent;
+              outline: none;
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Components/Input Text */
+              font-family: Inter;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 171.429% */
+              letter-spacing: 0.15px;
+            }
+          }
+        }
+      }
+    }
+    .note {
+      margin-top: 16px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      .btn-save,
+      .btn-cancel {
+        border-radius: 60px;
+        /* elevation/1 */
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        padding: 8px 22px;
+        color: var(--primary-contrast, #fff);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Components/Button Large */
+        font-family: Inter;
+        font-size: 15px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 26px;
+      }
+      .btn-cancel {
+        background: var(--secondary-main, #6c737f);
+      }
+      .btn-save {
+        background: var(--primary-main, #1d9a6c);
+      }
+    }
+  }
+`;

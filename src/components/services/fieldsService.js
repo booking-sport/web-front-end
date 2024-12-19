@@ -23,10 +23,10 @@ export const getFieldDetails = async (id) => {
     throw error;
   }
 };
-export const getPriceDetails = async (id, day, date) => {
+export const getPriceDetails = async (id, day, date, order_type) => {
   try {
     const response = await apiClient.get(
-      `/price/detail/${id}?dayOfWeek=${day}&date=${date}`,
+      `/price/detail/${id}?dayOfWeek=${day}&date=${date}&orderType=${order_type}`,
     );
     return response.data;
   } catch (error) {
