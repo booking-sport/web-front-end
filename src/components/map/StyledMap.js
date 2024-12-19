@@ -52,6 +52,7 @@ export const FilterContainer = styled.div`
   background: var(--background-paper, #fff);
   min-width: 500px;
   box-shadow: 0px 4px 18px 0px rgba(0, 0, 0, 0.08);
+  position: relative;
   > input {
     color: var(--text-disabled, rgba(17, 25, 39, 0.38));
     font-feature-settings:
@@ -90,6 +91,44 @@ export const FilterContainer = styled.div`
   }
   @media (max-width: 767px) {
     padding: 8px;
+  }
+  .popup-bar {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    z-index: 1000;
+  }
+
+  .popup-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .popup-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .popup-item:active {
+    background-color: #e5e5e5;
+  }
+  .field-detail {
+    width: 512px;
+    position: fixed;
+    top: 95px;
+    left: 24px;
+    padding: 0;
+    border-radius: 16px;
+    border: 1px solid var(--divider, #dfe4ec);
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
   }
 `;
 export const SortContainer = styled.div`

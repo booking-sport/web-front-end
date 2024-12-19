@@ -45,10 +45,14 @@ const ListContent = () => {
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [type, setType] = useState("");
+  const [name, setName] = useState("");
+  const [activeCategoryId, setActiveCategoryId] = useState();
+
   useEffect(() => {
     const fetchFields = async () => {
       try {
-        const data = await getSportsFields();
+        const data = await getSportsFields(type, name);
         setFields(data?.data);
       } catch (err) {
         setError(err.message);
@@ -57,7 +61,7 @@ const ListContent = () => {
       }
     };
     fetchFields();
-  }, []);
+  }, [type, name]);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -137,6 +141,10 @@ const ListContent = () => {
       </div>
     );
   };
+  const handleInputChange = (e) => {
+    setName(e.target.value);
+  };
+  console.log(type, 999);
 
   const ListHeader = () => {
     return (
@@ -145,7 +153,12 @@ const ListContent = () => {
         <SearchContainer>
           <span>Tìm kiếm</span>
           <div>
-            <input type="text" placeholder="Tìm tên sân..." />
+            <input
+              type="text"
+              placeholder="Tìm tên sân..."
+              value={name}
+              onChange={handleInputChange}
+            />
             <button>
               <SearchIconGrey />
             </button>
@@ -160,16 +173,10 @@ const ListContent = () => {
   };
   const ListContent = () => {
     const LeftBar = () => {
-      const handleCategoryClick = (id) => {
-        console.log("Selected category ID:", id);
-      };
-      const ListCategory = ({ onCategoryClick }) => {
-        const [activeCategoryId, setActiveCategoryId] = useState(1);
-        const handleCategoryClick = (id) => {
+      const ListCategory = () => {
+        const handleCategoryClick = (id, type) => {
           setActiveCategoryId(id);
-          if (onCategoryClick) {
-            onCategoryClick(id);
-          }
+          setType(type);
         };
         const category = [
           {
@@ -178,6 +185,7 @@ const ListContent = () => {
             name: "Sân banh",
             onCount: 112,
             offCount: 7,
+            type: "football",
           },
           {
             id: 2,
@@ -185,6 +193,7 @@ const ListContent = () => {
             name: "Sân cầu lông",
             onCount: 112,
             offCount: 7,
+            type: "badminton",
           },
           {
             id: 3,
@@ -192,6 +201,7 @@ const ListContent = () => {
             name: "Sân tennis",
             onCount: 112,
             offCount: 7,
+            type: "tennis",
           },
           {
             id: 4,
@@ -199,6 +209,7 @@ const ListContent = () => {
             name: "Sân bóng chuyền",
             onCount: 112,
             offCount: 7,
+            type: "volleyball",
           },
           {
             id: 5,
@@ -206,6 +217,7 @@ const ListContent = () => {
             name: "Sân bóng rổ",
             onCount: 112,
             offCount: 7,
+            type: "basketball",
           },
           {
             id: 6,
@@ -213,17 +225,18 @@ const ListContent = () => {
             name: "Sân phức hợp",
             onCount: 112,
             offCount: 7,
+            type: "football",
           },
         ];
         const CategoryItem = (props) => {
-          const { id, icon, name, onCount, offCount } = props;
+          const { id, icon, name, onCount, offCount, type } = props;
           const isActive = activeCategoryId === id;
-
+          console.log(activeCategoryId, id);
           const Icon = icon;
           return (
             <CategoryItemContainer
               className={`${isActive ? "active" : ""}`}
-              onClick={() => handleCategoryClick(id)}
+              onClick={() => handleCategoryClick(id, type)}
             >
               <div className="name">
                 <Icon
@@ -258,6 +271,7 @@ const ListContent = () => {
                   name={item.name}
                   onCount={item.onCount}
                   offCount={item.offCount}
+                  type={item.type}
                 />
               ))}
           </CategoryListContainer>
@@ -266,7 +280,7 @@ const ListContent = () => {
       return (
         <LeftBarContainer>
           <LeftBarTitle>Tất cả sân</LeftBarTitle>
-          <ListCategory onCategoryClick={handleCategoryClick} />
+          <ListCategory />
         </LeftBarContainer>
       );
     };
