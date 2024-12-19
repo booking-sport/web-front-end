@@ -232,7 +232,7 @@ const Login = ({ onLoginSuccess }) => {
     const jwt = Cookies.get("jwt");
     const savedUser = localStorage.getItem("user");
     if (savedUser && !jwt) {
-      localStorage.removeItem("user");
+      localStorage.setItem("user", JSON.stringify(null));
     } else if (savedUser && jwt) {
       navigate("/");
     }

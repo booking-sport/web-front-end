@@ -8,6 +8,7 @@ import {
   DeleteIcon,
   RightWhiteIcon,
   RightIcon,
+  CloseIcon,
 } from "@components/icons/svg";
 import {
   getFieldDetails,
@@ -25,9 +26,8 @@ import {
   TitleField,
   InputFieldContainer,
   InputField,
+  FixedSettingPopup,
 } from "./StyledSchedule";
-
-import { CloseIcon } from "../icons/svg";
 
 const Schedule = () => {
   const { id } = useParams();
@@ -43,11 +43,25 @@ const Schedule = () => {
   );
   const [popupInfo, setPopupInfo] = useState(null);
   const [isFixedBooking, setIsFixedBooking] = useState(false);
-  const [fixedBookingData, setFixedBookingData] = useState(null);
   const [isBooking, setIsBooking] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(100);
   let navigate = useNavigate();
+  const [isPopupSettingOpen, setIsPopupSettingOpen] = useState(false);
+  const [orderType, setOrderType] = useState("single_booking");
+  const [note, setNote] = useState("");
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+  const [duration, setDuration] = useState(1);
 
+  // console.log(
+  //   isFixedBooking,
+  //   duration,
+  //   endDate,
+  //   startDate,
+  //   orderType,
+  //   selectedDate,
+  //   9999,
+  // );
   //   const fields = [
   //     "Sân thường 1",
   //     "Sân thường 2",
@@ -74,7 +88,11 @@ const Schedule = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const today = moment().startOf("day").toDate();
     const maxDate = new Date();
-    maxDate.setDate(today.getDate() + 7);
+    maxDate.setDate(today.getDate() + 6);
+    if (isFixedBooking) {
+      maxDate.setDate(startDate.getDate());
+    }
+
     const openPopup = () => {
       setIsPopupOpen(!isPopupOpen);
     };
@@ -113,7 +131,7 @@ const Schedule = () => {
                 selected={selectedDate}
                 onChange={handleDateChange}
                 dateFormat="dd/MM/yyyy"
-                minDate={today}
+                minDate={isFixedBooking ? maxDate : today}
                 maxDate={maxDate}
                 inline
               />
@@ -124,7 +142,7 @@ const Schedule = () => {
           <button
             className="btn-prev"
             onClick={handlePrevDay}
-            disabled={selectedDate <= today}
+            disabled={selectedDate <= today || isFixedBooking}
           >
             <PrevIcon />
           </button>
@@ -139,7 +157,7 @@ const Schedule = () => {
           <button
             className="btn-next"
             onClick={handleNextDay}
-            disabled={selectedDate >= maxDate}
+            disabled={selectedDate >= maxDate || isFixedBooking}
           >
             <NextIcon />
           </button>
@@ -175,7 +193,12 @@ const Schedule = () => {
     const fetchPrice = async () => {
       try {
         setLoading(true);
-        const data = await getPriceDetails(id, dayOfWeek, formattedDate);
+        const data = await getPriceDetails(
+          id,
+          dayOfWeek,
+          formattedDate,
+          orderType,
+        );
         setPriceData(data?.data);
       } catch (err) {
         setError(err.message);
@@ -185,7 +208,7 @@ const Schedule = () => {
     };
 
     fetchPrice();
-  }, [id, dayOfWeek]);
+  }, [id, selectedDate, dayOfWeek, orderType]);
   useEffect(() => {
     const getPaymentInfo = async () => {
       try {
@@ -256,7 +279,7 @@ const Schedule = () => {
 
     const orders = result.flatMap(({ field, name, times }) =>
       times.map((time) => ({
-        orderType: "single_booking",
+        orderType: orderType,
         price: time.price,
         date: date,
         fieldId: parseInt(field, 10),
@@ -273,7 +296,10 @@ const Schedule = () => {
   const handleSelect = (field, fieldName, time, price) => {
     const slot = `${field}-${time}`;
     const updatedSlots = { ...selectedSlots };
-    const updatedFieldNames = { ...popupInfo?.fieldNames, [field]: fieldName };
+    const updatedFieldNames = {
+      ...popupInfo?.fieldNames,
+      [field]: fieldName,
+    };
 
     if (updatedSlots[slot]) {
       delete updatedSlots[slot];
@@ -374,34 +400,24 @@ const Schedule = () => {
         </td>
       );
     });
-  useEffect(() => {
-    const formattedDate = moment(selectedDate).format("YYYY-MM-DD");
-    const fetchPrice = async () => {
-      try {
-        setLoading(true);
-        const data = await getPriceDetails(id, dayOfWeek, formattedDate);
-        setPriceData(data?.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPrice();
-  }, [id, dayOfWeek]);
-
   //   const closePopup = () => {
   //     setPopupInfo(null);
   //   };
-  const handleSaveFixedBooking = (data) => {
-    setFixedBookingData(data);
-    setIsFixedBooking(true);
-  };
+
   const handlePayment = () => {
     setIsBooking(!isBooking);
   };
 
+  const handleOpenFixedBooking = () => {
+    setIsPopupSettingOpen(true);
+    setStartDate();
+  };
+  const handleCloseFixedBooking = () => {
+    setIsFixedBooking(false);
+    setOrderType("single_booking");
+    setSelectedDate(new Date());
+  };
+  const closePopupFixedBooking = () => setIsPopupSettingOpen(false);
   const Payment = () => {
     const savedUser = localStorage.getItem("user");
     const parsedUser = savedUser ? JSON.parse(savedUser) : null;
@@ -412,7 +428,6 @@ const Schedule = () => {
       parsedUser ? parsedUser.phone_number : "",
     );
     const [popupPayment, setPopupPayment] = useState(false);
-    const [note, setNote] = useState("");
     const [isShow, setIsShow] = useState(false);
     const handleUserName = (e) => {
       setUserName(e.target.value);
@@ -510,11 +525,13 @@ const Schedule = () => {
                 </div>
                 <div className="detail-info">
                   <div className="date">
-                    <span className="name-title">Ngày:</span>
+                    <span className="name-title">
+                      {isFixedBooking ? "Lịch cố định:" : "Ngày:"}
+                    </span>
                     <span>
-                      {selectedDate
-                        .toLocaleDateString("sv-SE")
-                        .replace(/-/g, "/")}
+                      {isFixedBooking
+                        ? `${moment(startDate).format("YYYY/MM/DD")} - ${moment(endDate).format("YYYY/MM/DD")}`
+                        : moment(selectedDate).format("YYYY/MM/DD")}
                     </span>
                   </div>
                   {popupInfo?.orders &&
@@ -750,6 +767,143 @@ const Schedule = () => {
       </ScheduleContainer>
     );
   };
+  const FixedSetting = () => {
+    const [tempOrderType, setTempOrderType] = useState(orderType);
+    const [tempStartDate, setTempStartDate] = useState(startDate);
+    const [tempEndDate, setTempEndDate] = useState(endDate);
+    const [tempDuration, setTempDuration] = useState(duration);
+
+    const updateTempEndDate = (start, months) => {
+      if (start) {
+        const updatedEndDate = new Date(start);
+        updatedEndDate.setMonth(updatedEndDate.getMonth() + months);
+        setTempEndDate(updatedEndDate);
+
+        if (months === 1) {
+          setTempOrderType("one_month");
+        } else if (months === 6) {
+          setTempOrderType("six_months");
+        } else if (months === 12) {
+          setTempOrderType("one_year");
+        }
+      }
+    };
+    const handleTempStartDateChange = (date) => {
+      setTempStartDate(date);
+      updateTempEndDate(date, tempDuration);
+    };
+
+    const handleTempDurationChange = (value) => {
+      const months = parseInt(value, 10);
+      setTempDuration(months);
+      updateTempEndDate(tempStartDate, months);
+    };
+    const handleSaveFixedBooking = () => {
+      setOrderType(tempOrderType);
+      setStartDate(tempStartDate);
+      setEndDate(tempEndDate);
+      setDuration(tempDuration);
+      setIsFixedBooking(true);
+      setSelectedDate(tempStartDate);
+      closePopupFixedBooking();
+    };
+    return (
+      <FixedSettingPopup className="popup-overlay">
+        <div className="popup-content">
+          <h3 className="title">Đặt lịch cố định</h3>
+          <button className="btn-close" onClick={closePopupFixedBooking}>
+            <CloseIcon />
+          </button>
+          <div className="select-duration">
+            <label>Chọn khoảng thời gian cố định:</label>
+            <div className="time-options">
+              <div className="time-item">
+                <input
+                  type="radio"
+                  name="duration"
+                  value="1"
+                  checked={tempDuration === 1}
+                  onChange={(e) => handleTempDurationChange(e.target.value)}
+                />
+                1 tháng
+              </div>
+              <div className="time-item">
+                <input
+                  type="radio"
+                  name="duration"
+                  value="6"
+                  checked={tempDuration === 6}
+                  onChange={(e) => handleTempDurationChange(e.target.value)}
+                />{" "}
+                6 tháng
+              </div>
+              <div className="time-item">
+                <input
+                  type="radio"
+                  name="duration"
+                  value="12"
+                  checked={tempDuration === 12}
+                  onChange={(e) => handleTempDurationChange(e.target.value)}
+                />{" "}
+                1 năm
+              </div>
+            </div>
+          </div>
+          <div className="select-time">
+            <label>Thời gian:</label>
+            <div className="time-container">
+              <InputFieldContainer>
+                <TitleField>Bắt đầu</TitleField>
+                <DatePicker
+                  selected={tempStartDate}
+                  onChange={handleTempStartDateChange}
+                  minDate={new Date()}
+                  placeholderText="Chọn ngày bắt đầu"
+                />
+                <CalendarIcon />
+              </InputFieldContainer>
+              <InputFieldContainer>
+                <TitleField>Kết thúc</TitleField>
+                <DatePicker
+                  selected={tempEndDate}
+                  onChange={(date) => setTempEndDate(date)}
+                  disabled
+                  placeholderText="Ngày kết thúc "
+                />
+                <CalendarIcon />
+              </InputFieldContainer>
+            </div>
+          </div>
+          {/* <div className="note">
+            <InputFieldContainer>
+              <TitleField>Ghi chú (cho chủ sân): </TitleField>
+              <InputField
+                placeholder="Nhập ghi chú "
+                type="text"
+                onChange={(e) => setNote(e.target.value)}
+              />
+            </InputFieldContainer>
+          </div> */}
+          <div className="actions">
+            <button onClick={closePopupFixedBooking} className="btn-cancel">
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="btn-save"
+              disabled={tempStartDate ? false : true}
+              onClick={() => {
+                handleSaveFixedBooking();
+                closePopupFixedBooking();
+              }}
+            >
+              Lưu cài đặt
+            </button>
+          </div>
+        </div>
+      </FixedSettingPopup>
+    );
+  };
   return isBooking
     ? stadium && <Payment />
     : stadium && (
@@ -760,13 +914,19 @@ const Schedule = () => {
                 <ArrowLeftIcon />
                 Quay lại
               </button>
-              <h3 className="name">Lịch sân - {stadium.name}</h3>
+              <h3 className="name">Lịch sân - {stadium?.name}</h3>
             </div>
             <button
               className="fixed-booking"
-              onClick={() => console.log(selectedSlots)}
+              onClick={
+                isFixedBooking
+                  ? handleCloseFixedBooking
+                  : handleOpenFixedBooking
+              }
             >
-              Đặt lịch cố định
+              {isFixedBooking && orderType !== "single_booking"
+                ? "Đặt lịch trong ngày"
+                : "Đặt lịch cố định"}
             </button>
           </div>
           <div className="content-container">
@@ -820,6 +980,18 @@ const Schedule = () => {
                             ))}
                           </div>
                         </div>
+                        {isFixedBooking && (
+                          <div className="info">
+                            <span>Cố định: </span>
+                            <div className="orders">
+                              <div>
+                                {duration} tháng ({" "}
+                                {moment(startDate).format("YYYY/MM/DD")} -
+                                {moment(endDate).format("YYYY/MM/DD")} )
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         <div className="payment">
                           <div className="total-price">
                             <span className="title">Tổng tiền:</span>
@@ -864,59 +1036,7 @@ const Schedule = () => {
               </div>
             </div>
           </div>
-          {/* {isPopupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content">
-              <h3>Đặt lịch cố định</h3>
-              <div>
-                <label>Chọn khoảng thời gian cố định:</label>
-                <div className="time-options">
-                  <label>
-                    <input type="radio" name="duration" value="1" /> 1 tháng
-                  </label>
-                  <label>
-                    <input type="radio" name="duration" value="6" /> 6 tháng
-                  </label>
-                  <label>
-                    <input type="radio" name="duration" value="12" /> 1 năm
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label>Thời gian:</label>
-                <div>
-                  <DatePicker
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
-                  />
-                  <DatePicker
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
-                  />
-                </div>
-              </div>
-              <div>
-                <label>Ghi chú:</label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  placeholder="Nhập ghi chú"
-                />
-              </div>
-              <div className="actions">
-                <button onClick={closePopup}>Hủy</button>
-                <button
-                  onClick={() => {
-                    handleSaveFixedBooking({ startDate, endDate, note });
-                    closePopup();
-                  }}
-                >
-                  Lưu cài đặt
-                </button>
-              </div>
-            </div>
-          </div>
-        )} */}
+          {isPopupSettingOpen && <FixedSetting />}
         </ScheduleContainer>
       );
 };
