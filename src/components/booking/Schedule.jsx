@@ -396,7 +396,7 @@ const Schedule = () => {
             }
           }}
         >
-          {price}
+          {/* {price} */}
         </td>
       );
     });

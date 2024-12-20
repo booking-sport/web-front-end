@@ -1,11 +1,11 @@
 import apiClient from "./apiClient";
 
-export const getSportsFields = async (params = {}) => {
+export const getSportsFields = async (type, name) => {
   try {
-    const queryParams = new URLSearchParams(params).toString();
-
     // const response = await apiClient.get(`/stadiums/all?${queryParams}`);
-    const response = await apiClient.get(`/stadiums/all`);
+    const response = await apiClient.get(
+      `/stadiums/all/?stadiumType=${type}&name=${name}`,
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching sports fields:", error);
