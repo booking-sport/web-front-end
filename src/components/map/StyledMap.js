@@ -183,6 +183,12 @@ export const FieldDetailContainer = styled.div`
   > img.main-image {
     max-width: 100%;
   }
+  .btn-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    padding: 0;
+  }
   .stadium-info {
     .top {
       padding: 20px 20px 8px;

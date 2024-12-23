@@ -40,6 +40,7 @@ import {
   StarsContainer,
   TimeContainer,
 } from "./StyledList";
+import { debounce } from "lodash";
 import { getSportsFields } from "@components/services/fieldsService";
 const ListContent = () => {
   const [fields, setFields] = useState([]);
@@ -141,12 +142,20 @@ const ListContent = () => {
       </div>
     );
   };
-  const handleInputChange = (e) => {
-    setName(e.target.value);
-  };
-  console.log(type, 999);
 
-  const ListHeader = () => {
+  const ListHeader = ({ value, onSearch }) => {
+    const [localName, setLocalName] = useState(value);
+    useEffect(() => {
+      const debouncedSearch = debounce(() => {
+        onSearch(localName);
+      }, 300);
+
+      debouncedSearch();
+      return () => debouncedSearch.cancel();
+    }, [localName, onSearch]);
+    const handleInputChange = (e) => {
+      setLocalName(e.target.value);
+    };
     return (
       <ListHeaderContainer>
         <ListHeaderTitle>Danh sách sân</ListHeaderTitle>
@@ -156,7 +165,7 @@ const ListContent = () => {
             <input
               type="text"
               placeholder="Tìm tên sân..."
-              value={name}
+              value={localName}
               onChange={handleInputChange}
             />
             <button>
@@ -788,7 +797,7 @@ const ListContent = () => {
   };
   return (
     <ListContainer>
-      <ListHeader />
+      <ListHeader value={name} onSearch={setName} />
       <ListContent />
     </ListContainer>
   );

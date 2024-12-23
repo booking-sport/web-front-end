@@ -11,6 +11,7 @@ import {
   AddressIcon,
   TelIcon,
   TimeIcon,
+  CloseIcon,
 } from "@components/icons/svg";
 import maplibregl from "maplibre-gl";
 import ReactDOMServer from "react-dom/server";
@@ -37,8 +38,10 @@ const Map = () => {
   const [type, setType] = useState("");
   const [activeButton, setActiveButton] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-  const [name, setName] = useState("");
+  const [nameSearch, setNameSearch] = useState("");
   const [selectedField, setSelectedField] = useState(null);
+  const [showFieldDetail, setShowFieldDetail] = useState(false);
+
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
       const fullStars = Math.floor(score);
@@ -79,6 +82,11 @@ const Map = () => {
     console.log(field, 999);
     return (
       <FieldDetailContainer>
+        {onClose && (
+          <button className="btn-close" onClick={onClose}>
+            <CloseIcon />
+          </button>
+        )}
         <img
           className="main-image"
           src={field.images[0] || "/images/image-default.png"}
@@ -120,6 +128,13 @@ const Map = () => {
         </div>
       </FieldDetailContainer>
     );
+  };
+  const onShowFieldDetail = () => {
+    setShowFieldDetail(true);
+  };
+
+  const onCloseFieldDetail = () => {
+    setShowFieldDetail(false);
   };
 
   useEffect(() => {
@@ -193,9 +208,19 @@ const Map = () => {
     }
   }, [map]);
   const FilterSort = () => {
-    const Filter = () => {
+    const Filter = ({ value, onSearch }) => {
+      const [localName, setLocalName] = useState(value);
+      useEffect(() => {
+        const debouncedSearch = debounce(() => {
+          onSearch(localName);
+        }, 300);
+
+        debouncedSearch();
+        return () => debouncedSearch.cancel();
+      }, [localName, onSearch]);
+
       const handleInputChange = (e) => {
-        setName(e.target.value);
+        setLocalName(e.target.value);
       };
       const handleInputFocus = () => {
         setShowPopup(true);
@@ -206,7 +231,7 @@ const Map = () => {
           <input
             type="text"
             placeholder="Tìm kiếm sân..."
-            value={name}
+            value={localName}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
           />
@@ -221,9 +246,9 @@ const Map = () => {
                     key={field.id}
                     className="popup-item"
                     onClick={() => {
-                      setName(field.name);
                       setShowPopup(false);
                       setSelectedField(field);
+                      onShowFieldDetail();
                     }}
                   >
                     {field.name}
@@ -234,9 +259,9 @@ const Map = () => {
               )}
             </div>
           )}
-          {selectedField && (
+          {showFieldDetail && selectedField && (
             <div className="field-detail">
-              <FieldDetail field={selectedField} />
+              <FieldDetail onClose={onCloseFieldDetail} field={selectedField} />
             </div>
           )}
         </FilterContainer>
@@ -323,7 +348,7 @@ const Map = () => {
     };
     return (
       <FilterSortContainer>
-        <Filter />
+        <Filter value={nameSearch} onSearch={setNameSearch} />
         <Sort />
       </FilterSortContainer>
     );
@@ -343,10 +368,10 @@ const Map = () => {
   }, [type]);
 
   const fetchFieldsFilter = debounce(
-    async (type, name, setFilterResults, setError, setLoading) => {
+    async (type, nameSearch, setFilterResults, setError, setLoading) => {
       try {
         setLoading(true);
-        const data = await getSportsFields(type, name);
+        const data = await getSportsFields(type, nameSearch);
         setFilterResults(data?.data || []);
       } catch (err) {
         setError(err.message);
@@ -358,12 +383,12 @@ const Map = () => {
   );
 
   useEffect(() => {
-    if (name.trim() === "") {
+    if (nameSearch.trim() === "") {
       setFilterResults([]);
       return;
     }
-    fetchFieldsFilter(type, name, setFilterResults, setError, setLoading);
-  }, [type, name]);
+    fetchFieldsFilter(type, nameSearch, setFilterResults, setError, setLoading);
+  }, [type, nameSearch]);
   return (
     <MapContainer className="map-container" ref={mapContainer}>
       <FilterSort />
