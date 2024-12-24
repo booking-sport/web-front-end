@@ -27,6 +27,7 @@ import {
   StarsContainer,
 } from "./StyledMap";
 import { getSportsFields } from "@components/services/fieldsService";
+import { getRoute } from "@components/services/routeServices";
 
 const Map = () => {
   const mapContainer = useRef(null);
@@ -41,6 +42,10 @@ const Map = () => {
   const [nameSearch, setNameSearch] = useState("");
   const [selectedField, setSelectedField] = useState(null);
   const [showFieldDetail, setShowFieldDetail] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [selectedStadium, setSelectedStadium] = useState(null);
+
+  const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY;
 
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
@@ -150,6 +155,27 @@ const Map = () => {
     return () => mapInstance.remove();
   }, [fields]);
   useEffect(() => {
+    if (!map) return;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([longitude, latitude]);
+
+          new maplibregl.Marker({ color: "blue" })
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        },
+        (error) => console.error("Error getting location:", error),
+        { enableHighAccuracy: true },
+      );
+    } else {
+      console.warn("Geolocation is not supported by this browser.");
+    }
+  }, [map]);
+
+  useEffect(() => {
     if (map && fields.length > 0) {
       // const bounds = new maplibregl.LngLatBounds();
       fields.forEach((field) => {
@@ -190,6 +216,9 @@ const Map = () => {
         );
 
         marker.setPopup(popup);
+        marker.getElement().addEventListener("click", () => {
+          handleStadiumClick(field); // Pass the clicked field's data to the handler
+        });
       });
     }
   }, [map, fields]);
@@ -207,6 +236,57 @@ const Map = () => {
       return () => window.removeEventListener("resize", handleResize);
     }
   }, [map]);
+  useEffect(() => {
+    if (!map || !userLocation || !selectedStadium) return;
+
+    const drawRoute = async () => {
+      try {
+        const route = await getRoute(userLocation, selectedStadium, apiKey);
+
+        const routeLayer = {
+          id: "route",
+          type: "line",
+          source: {
+            type: "geojson",
+            data: {
+              type: "Feature",
+              geometry: route,
+            },
+          },
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#ff0000",
+            "line-width": 4,
+          },
+        };
+
+        if (map.getLayer("route")) {
+          map.removeLayer("route");
+          map.removeSource("route");
+        }
+
+        map.addLayer(routeLayer);
+      } catch (error) {
+        console.error("Error drawing route:", error);
+      }
+    };
+
+    drawRoute();
+  }, [map, userLocation, selectedStadium]);
+  const handleStadiumClick = (field) => {
+    if (field.longitude && field.latitude) {
+      setSelectedStadium([field.longitude, field.latitude]);
+
+      map.flyTo({
+        center: [field.longitude, field.latitude],
+        zoom: 14,
+      });
+    }
+  };
+
   const FilterSort = () => {
     const Filter = ({ value, onSearch }) => {
       const [localName, setLocalName] = useState(value);
