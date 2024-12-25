@@ -305,6 +305,7 @@ export const StadiumItemContainer = styled.div`
   flex-direction: column;
   padding: 16px;
   gap: 16px;
+  height: fit-content;
   @media (max-width: 1919px) {
     width: calc(25% - 50px);
     max-width: unset;
