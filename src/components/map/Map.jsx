@@ -45,7 +45,7 @@ const Map = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedStadium, setSelectedStadium] = useState(null);
 
-  const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY;
+  const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY || "";
 
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
@@ -154,6 +154,19 @@ const Map = () => {
 
     return () => mapInstance.remove();
   }, [fields]);
+
+  const handleFocusOnUserLocation = () => {
+    if (map && userLocation) {
+      map.flyTo({
+        center: userLocation,
+        zoom: 14,
+        essential: true,
+      });
+    } else {
+      alert("User location not available");
+    }
+  };
+
   useEffect(() => {
     if (!map) return;
 
@@ -293,12 +306,12 @@ const Map = () => {
       useEffect(() => {
         const debouncedSearch = debounce(() => {
           onSearch(localName);
-        }, 300);
+        }, 1000);
 
         debouncedSearch();
         return () => debouncedSearch.cancel();
       }, [localName, onSearch]);
-
+      const containerRef = useRef(null);
       const handleInputChange = (e) => {
         setLocalName(e.target.value);
       };
@@ -306,8 +319,24 @@ const Map = () => {
         setShowPopup(true);
       };
 
+      useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (
+            containerRef.current &&
+            !containerRef.current.contains(event.target)
+          ) {
+            setShowPopup(false);
+          }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, []);
       return (
-        <FilterContainer>
+        <FilterContainer ref={containerRef}>
           <input
             type="text"
             placeholder="Tìm kiếm sân..."
@@ -332,6 +361,7 @@ const Map = () => {
                     }}
                   >
                     {field.name}
+                    {field.rate}
                   </div>
                 ))
               ) : (
@@ -459,7 +489,7 @@ const Map = () => {
         setLoading(false);
       }
     },
-    300,
+    1000,
   );
 
   useEffect(() => {
@@ -472,6 +502,14 @@ const Map = () => {
   return (
     <MapContainer className="map-container" ref={mapContainer}>
       <FilterSort />
+      <div className="focus-location">
+        <button
+          className="focus-user-location-btn"
+          onClick={handleFocusOnUserLocation}
+        >
+          <span></span>
+        </button>
+      </div>
     </MapContainer>
   );
 };

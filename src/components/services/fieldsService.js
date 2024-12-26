@@ -103,3 +103,13 @@ export const editNameById = async (id, fullName) => {
     throw error;
   }
 };
+
+export const checkPaymentStatus = async (orderCode) => {
+  try {
+    const response = await apiClient.get(`/payment/${orderCode}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    throw error;
+  }
+};

@@ -103,10 +103,10 @@ export const TimeContainer = styled.div`
   border-radius: 8px;
   border: 1px solid var(--divider, #dfe4ec);
   display: flex;
-  overflow: hidden;
   flex-direction: column;
   padding: 9px 12px;
   flex: 1;
+  position: relative;
   @media (max-width: 1023px) {
     flex: 2;
   }
@@ -157,10 +157,39 @@ export const TimeContainer = styled.div`
       border-radius: 8px;
       border: 1px solid var(--divider, #dfe4ec);
       right: 0;
+      top: 100%;
       .popup-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
         h3 {
-          margin: 0 0 8px;
+          margin: 0;
         }
+      }
+      .time-picker {
+        display: flex;
+        gap: 20px;
+        color: var(--text-primary, #111927);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        font-family: Inter;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 150%; /* 24px */
+        letter-spacing: 0.15px;
+      }
+      .btn-close {
+        border-radius: 60px;
+        background: var(--primary-main, #1d9a6c);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        border: 0;
+        color: var(--primary-contrast, #fff);
+        font-family: Inter;
+        font-size: 14px;
+        padding: 4px 12px;
+        width: fit-content;
       }
     }
   }
@@ -291,7 +320,6 @@ export const RightBarContainer = styled.div`
   gap: 20px;
   flex-wrap: wrap;
   overflow: auto;
-  width: 100%;
 `;
 export const StadiumItemContainer = styled.div`
   border-radius: 12px;

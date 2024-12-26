@@ -65,78 +65,64 @@ const ListContent = () => {
   }, [type, name]);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [step, setStep] = useState(1);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTime, setSelectedTime] = useState("");
+    const [selectedDateTime, setSelectedDateTime] = useState({
+      date: null,
+      time: "",
+    });
 
-    const openPopup = () => {
-      setIsPopupOpen(!isPopupOpen);
-    };
-
-    const closePopup = () => {
-      setIsPopupOpen(false);
-      setStep(1);
-    };
+    const togglePopup = () => setIsPopupOpen((prev) => !prev);
 
     const handleDateChange = (date) => {
-      setSelectedDate(date);
-      setStep(2);
+      setSelectedDateTime((prev) => ({ ...prev, date }));
     };
 
     const handleTimeChange = (e) => {
       const time = e.target.value;
-      setSelectedTime(e.target.value);
-      if (selectedDate) {
-        closePopup();
-        console.log(`Ngày: ${selectedDate} Giờ: ${time}`);
-      }
+      setSelectedDateTime((prev) => ({ ...prev, time }));
     };
 
-    const swipeHandlers = useSwipeable({
-      onSwipedLeft: () => step === 1 && setStep(2),
-      onSwipedRight: () => step === 2 && setStep(1),
-      trackMouse: true,
-    });
-
+    const closePopup = () => setIsPopupOpen(false);
     return (
       <div className="date-time">
         {isPopupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content" {...swipeHandlers}>
-              {step === 1 && (
-                <div>
-                  <h3>Chọn ngày</h3>
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={handleDateChange}
-                    dateFormat="dd/MM/yyyy"
-                    inline
-                  />
-                </div>
-              )}
-              {step === 2 && (
-                <div>
-                  <h3>Chọn giờ</h3>
-                  <input
-                    type="time"
-                    value={selectedTime}
-                    onChange={handleTimeChange}
-                  />
-                </div>
-              )}
+          <div className="popup-overlay" onClick={closePopup}>
+            <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+              <h3>Chọn ngày và giờ</h3>
+              <div className="date-picker">
+                <DatePicker
+                  selected={selectedDateTime.date}
+                  onChange={handleDateChange}
+                  dateFormat="dd/MM/yyyy"
+                  inline
+                  minDate={new Date()}
+                />
+              </div>
+              <div className="time-picker">
+                <label htmlFor="time">Giờ:</label>
+                <input
+                  type="time"
+                  id="time"
+                  value={selectedDateTime.time}
+                  onChange={handleTimeChange}
+                />
+              </div>
+              <button className="btn-close" onClick={closePopup}>
+                Đóng
+              </button>
             </div>
           </div>
         )}
         <p className="text-time">
-          {selectedDate && selectedTime ? (
+          {selectedDateTime.date && selectedDateTime.time ? (
             <>
-              {selectedDate.toLocaleDateString()} {selectedTime}
+              {selectedDateTime.date.toLocaleDateString()}{" "}
+              {selectedDateTime.time}
             </>
           ) : (
             "Tất cả"
           )}
         </p>
-        <button className="btn-select-time" onClick={openPopup}>
+        <button className="btn-select-time" onClick={togglePopup}>
           <CalendarIcon />
         </button>
       </div>
@@ -148,7 +134,7 @@ const ListContent = () => {
     useEffect(() => {
       const debouncedSearch = debounce(() => {
         onSearch(localName);
-      }, 300);
+      }, 1000);
 
       debouncedSearch();
       return () => debouncedSearch.cancel();
@@ -240,7 +226,6 @@ const ListContent = () => {
         const CategoryItem = (props) => {
           const { id, icon, name, onCount, offCount, type } = props;
           const isActive = activeCategoryId === id;
-          console.log(activeCategoryId, id);
           const Icon = icon;
           return (
             <CategoryItemContainer

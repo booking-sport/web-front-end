@@ -170,7 +170,7 @@ export const MobileNav = styled.div`
   height: 100%;
   background: #1d9a6c;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 1000;
   transition: right 0.3s ease;
 
   &.open {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import QRCode from "react-qr-code";
 import {
   ArrowLeftIcon,
   CalendarIcon,
@@ -15,6 +16,7 @@ import {
   getPriceDetails,
   createOrder,
   getPaymentInfoByStadiumId,
+  checkPaymentStatus,
 } from "@components/services/fieldsService";
 import classNames from "classnames";
 import moment from "moment";
@@ -52,7 +54,9 @@ const Schedule = () => {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [duration, setDuration] = useState(1);
-
+  const [qrCode, setQrCode] = useState("");
+  const [orderCode, setOrderCode] = useState("");
+  console.log(qrCode, 999);
   // console.log(
   //   isFixedBooking,
   //   duration,
@@ -429,6 +433,9 @@ const Schedule = () => {
     );
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(600);
+    const [orderStatus, setOrderStatus] = useState(null);
+
     const handleUserName = (e) => {
       setUserName(e.target.value);
     };
@@ -453,22 +460,81 @@ const Schedule = () => {
     const handleOrders = async (e) => {
       e.preventDefault();
       setPopupPayment(true);
+      const adjustedOrders = popupInfo.orders.map((order) => ({
+        ...order,
+        deposit: stadium.deposit !== 0 ? paymentMethod : 0,
+      }));
       const result = await createOrder(
         stadium.id,
-        popupInfo.orders,
+        adjustedOrders,
         note,
         userName,
         userNumber,
       );
       if (result.data) {
         console.log(result);
-        alert("Orders successfully created");
+        // alert("Orders successfully created");
+        setQrCode(result?.data?.qrCode);
+        setOrderCode(result?.data?.orderCode);
       } else {
         setError(result.message);
         console.log(error);
       }
     };
 
+    useEffect(() => {
+      if (!popupPayment) return;
+
+      const interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            handleOrderTimeout();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      const checkPaymentInterval = setInterval(async () => {
+        if (timeLeft > 0 && orderStatus !== "PAID") {
+          try {
+            const data = await checkPaymentStatus(orderCode);
+            setOrderStatus(data.status);
+            if (data.status === "PAID") {
+              clearInterval(interval);
+              clearInterval(checkPaymentInterval);
+              alert("Thanh toán thành công!");
+              handleClosePopupPayment();
+              console.log(222);
+            }
+          } catch (error) {
+            console.error("Failed to check payment status:", error);
+          }
+        }
+      }, 10000);
+      return () => {
+        clearInterval(interval);
+        clearInterval(checkPaymentInterval);
+      };
+    }, [popupPayment, timeLeft, orderStatus]);
+
+    const handleOrderTimeout = () => {
+      if (orderStatus !== "PAID") {
+        console.log(1111);
+        alert(
+          "Đơn hàng đã bị hủy do không thanh toán trong thời gian quy định.",
+        );
+        handleClosePopupPayment();
+      }
+    };
+
+    const formatTime = (seconds) => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    };
+    console.log(popupPayment, 88888);
     return (
       <ScheduleContainer className="payment-container">
         <div className="header">
@@ -587,7 +653,7 @@ const Schedule = () => {
                             <input
                               type="radio"
                               name="paymentMethod"
-                              value="30"
+                              value={stadium.deposit}
                               checked={paymentMethod === stadium.deposit}
                               onChange={() => setPaymentMethod(stadium.deposit)}
                             />
@@ -643,7 +709,7 @@ const Schedule = () => {
               <div className="dialog-content">
                 <span className="title">Quét mã QR hoặc nhập thông tin</span>
                 <div className="bank-info">
-                  <img src="/images/test-qr.PNG" alt="" />
+                  <QRCode value={qrCode} size={155} />
                   <div className="info">
                     <div className="info-item">
                       <span className="title">Chủ tài khoản</span>
@@ -754,7 +820,7 @@ const Schedule = () => {
                   <br />
                   Đơn hàng của bạn còn được giữ chỗ trong:
                   <br />
-                  <span className="time">05:32</span>
+                  <span className="time">{formatTime(timeLeft)}</span>
                 </div>
               </div>
               {/* <div className="dialog-footer">
