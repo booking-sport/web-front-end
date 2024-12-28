@@ -35,11 +35,19 @@ export const getPriceDetails = async (id, day, date, order_type) => {
   }
 };
 
-export const createOrder = async (id, orders, note, userName, userNumber) => {
+export const createOrder = async (
+  id,
+  orders,
+  deposit,
+  note,
+  userName,
+  userNumber,
+) => {
   try {
     const response = await apiClient.post(`/orders/stadium/${id}`, {
       orders: orders,
       note: note,
+      deposit: deposit,
       fullName: userName,
       phoneNumber: userNumber,
     });

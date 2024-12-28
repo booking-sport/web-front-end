@@ -5,11 +5,12 @@ export const MapContainer = styled.div`
   height: 100vh;
   position: relative;
   .maplibregl-popup {
-    position: unset !important;
     transform: unset !important;
+    max-width: unset !important;
+    width: 100%;
+    z-index: 100;
     .maplibregl-popup-content {
       max-width: 512px;
-      width: 100%;
       position: fixed;
       top: 95px;
       left: 24px;
@@ -20,10 +21,14 @@ export const MapContainer = styled.div`
       /* elevation/5 */
       box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
       overflow: hidden;
+      width: calc(100% - 48px);
       .maplibregl-popup-close-button {
         color: white;
         font-size: 24px;
         padding: 6px 12px;
+      }
+      @media (min-width: 512px) {
+        width: 100%;
       }
     }
   }

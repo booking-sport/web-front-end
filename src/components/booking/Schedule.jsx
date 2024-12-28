@@ -46,11 +46,9 @@ const Schedule = () => {
   const [popupInfo, setPopupInfo] = useState(null);
   const [isFixedBooking, setIsFixedBooking] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(100);
   let navigate = useNavigate();
   const [isPopupSettingOpen, setIsPopupSettingOpen] = useState(false);
   const [orderType, setOrderType] = useState("single_booking");
-  const [note, setNote] = useState("");
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [duration, setDuration] = useState(1);
@@ -431,6 +429,9 @@ const Schedule = () => {
     const [userNumber, setUserNumber] = useState(
       parsedUser ? parsedUser.phone_number : "",
     );
+    const [note, setNote] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState(100);
+
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
     const [timeLeft, setTimeLeft] = useState(600);
@@ -460,13 +461,12 @@ const Schedule = () => {
     const handleOrders = async (e) => {
       e.preventDefault();
       setPopupPayment(true);
-      const adjustedOrders = popupInfo.orders.map((order) => ({
-        ...order,
-        deposit: stadium.deposit !== 0 ? paymentMethod : 0,
-      }));
+
+      const deposit = stadium.deposit !== 0 ? paymentMethod : 0;
       const result = await createOrder(
         stadium.id,
-        adjustedOrders,
+        popupInfo.orders,
+        deposit,
         note,
         userName,
         userNumber,
