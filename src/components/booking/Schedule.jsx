@@ -282,7 +282,7 @@ const Schedule = () => {
     const orders = result.flatMap(({ field, name, times }) =>
       times.map((time) => ({
         orderType: orderType,
-        price: time.price,
+        price: time.price * 1000,
         date: date,
         fieldId: parseInt(field, 10),
         fieldName: name,
@@ -316,10 +316,11 @@ const Schedule = () => {
       updatedFieldNames,
     );
 
-    const totalPrice = Object.values(updatedSlots).reduce(
-      (sum, currentPrice) => sum + currentPrice,
-      0,
-    );
+    const totalPrice =
+      Object.values(updatedSlots).reduce(
+        (sum, currentPrice) => sum + currentPrice,
+        0,
+      ) * 1000;
     const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
 
     setPopupInfo({
@@ -361,10 +362,11 @@ const Schedule = () => {
       updatedFieldNames,
     );
 
-    const totalPrice = Object.values(updatedSlots).reduce(
-      (sum, currentPrice) => sum + currentPrice,
-      0,
-    );
+    const totalPrice =
+      Object.values(updatedSlots).reduce(
+        (sum, currentPrice) => sum + currentPrice,
+        0,
+      ) * 1000;
     const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
     setPopupInfo({
       groupedData,
@@ -615,7 +617,7 @@ const Schedule = () => {
                           </div>
                           <div>
                             <span className="price">
-                              {(order.price * 1000).toLocaleString("vi-VN")} đ
+                              {order.price.toLocaleString("vi-VN")} đ
                             </span>
                             <button
                               className="delete"
@@ -639,7 +641,7 @@ const Schedule = () => {
                   <div className="total-price">
                     <span className="title">Tổng tiền:</span>
                     <span>
-                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                      {(popupInfo?.totalPrice).toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                   <div className="payment-method">
@@ -677,9 +679,7 @@ const Schedule = () => {
                     <span className="title">Số tiền phải trả</span>
                     <span className="price">
                       {(
-                        popupInfo?.totalPrice *
-                        1000 *
-                        (paymentMethod / 100 || 1)
+                        popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                       ).toLocaleString("vi-VN")}{" "}
                       đ
                     </span>
@@ -775,10 +775,7 @@ const Schedule = () => {
                                 </div>
                                 <div>
                                   <span className="price">
-                                    {(order.price * 1000).toLocaleString(
-                                      "vi-VN",
-                                    )}{" "}
-                                    đ
+                                    {order.price.toLocaleString("vi-VN")} đ
                                   </span>
                                 </div>
                               </div>
@@ -792,7 +789,7 @@ const Schedule = () => {
                   <div className="total-price">
                     <span className="title">Thành tiền</span>
                     <span className="value">
-                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                      {(popupInfo?.totalPrice).toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                   <div className="deposit">
@@ -811,9 +808,7 @@ const Schedule = () => {
                   Vui lòng chuyển khoản{" "}
                   <strong>
                     {(
-                      popupInfo?.totalPrice *
-                      1000 *
-                      (paymentMethod / 100 || 1)
+                      popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                     ).toLocaleString("vi-VN")}{" "}
                   </strong>
                   đ trong vòng <strong>10 phút</strong> để hoàn tất đặt lịch!
@@ -1062,7 +1057,7 @@ const Schedule = () => {
                           <div className="total-price">
                             <span className="title">Tổng tiền:</span>
                             <span className="price">
-                              {popupInfo.totalPrice}k
+                              {popupInfo.totalPrice.toLocaleString("vi-VN")}đ
                             </span>
                           </div>
                           <button
