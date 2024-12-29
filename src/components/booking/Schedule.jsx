@@ -796,9 +796,7 @@ const Schedule = () => {
                     <span className="title">Cọc trước</span>
                     <span className="value">
                       {(
-                        popupInfo?.totalPrice *
-                        1000 *
-                        (paymentMethod / 100 || 1)
+                        popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                       ).toLocaleString("vi-VN")}{" "}
                       đ
                     </span>
