@@ -52,9 +52,7 @@ const Schedule = () => {
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [duration, setDuration] = useState(1);
-  const [qrCode, setQrCode] = useState("");
-  const [orderCode, setOrderCode] = useState("");
-  console.log(qrCode, 999);
+
   // console.log(
   //   isFixedBooking,
   //   duration,
@@ -436,8 +434,11 @@ const Schedule = () => {
 
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(600);
+    const [timeLeft, setTimeLeft] = useState(300);
     const [orderStatus, setOrderStatus] = useState(null);
+    const [qrCode, setQrCode] = useState("");
+    const [orderCode, setOrderCode] = useState("");
+    console.log(qrCode, 999);
 
     const handleUserName = (e) => {
       setUserName(e.target.value);
@@ -483,14 +484,13 @@ const Schedule = () => {
         console.log(error);
       }
     };
-
     useEffect(() => {
       if (!popupPayment) return;
 
-      const interval = setInterval(() => {
+      const countdownInterval = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
-            clearInterval(interval);
+            clearInterval(countdownInterval);
             handleOrderTimeout();
             return 0;
           }
@@ -499,31 +499,29 @@ const Schedule = () => {
       }, 1000);
 
       const checkPaymentInterval = setInterval(async () => {
-        if (timeLeft > 0 && orderStatus !== "PAID") {
-          try {
-            const data = await checkPaymentStatus(orderCode);
-            setOrderStatus(data.status);
-            if (data.status === "PAID") {
-              clearInterval(interval);
-              clearInterval(checkPaymentInterval);
-              alert("Thanh toán thành công!");
-              handleClosePopupPayment();
-              console.log(222);
-            }
-          } catch (error) {
-            console.error("Failed to check payment status:", error);
+        try {
+          const data = await checkPaymentStatus(orderCode);
+          if (data.status === "PAID") {
+            clearInterval(countdownInterval);
+            clearInterval(checkPaymentInterval);
+            setOrderStatus("PAID");
+            alert("Thanh toán thành công!");
+            const updatedData = await checkPaymentStatus(orderCode);
+            console.log("Updated Payment Info:", updatedData);
+            handleClosePopupPayment();
           }
+        } catch (error) {
+          console.error("Failed to check payment status:", error);
         }
       }, 10000);
+
       return () => {
-        clearInterval(interval);
+        clearInterval(countdownInterval);
         clearInterval(checkPaymentInterval);
       };
-    }, [popupPayment, timeLeft, orderStatus]);
-
+    }, [popupPayment, orderCode]);
     const handleOrderTimeout = () => {
       if (orderStatus !== "PAID") {
-        console.log(1111);
         alert(
           "Đơn hàng đã bị hủy do không thanh toán trong thời gian quy định.",
         );
@@ -536,6 +534,7 @@ const Schedule = () => {
       const secs = seconds % 60;
       return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     };
+
     console.log(popupPayment, 88888);
     return (
       <ScheduleContainer className="payment-container">
@@ -809,7 +808,7 @@ const Schedule = () => {
                       popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                     ).toLocaleString("vi-VN")}{" "}
                   </strong>
-                  đ trong vòng <strong>10 phút</strong> để hoàn tất đặt lịch!
+                  đ trong vòng <strong>5 phút</strong> để hoàn tất đặt lịch!
                   <br />
                   Đơn hàng của bạn còn được giữ chỗ trong:
                   <br />

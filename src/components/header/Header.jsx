@@ -66,17 +66,20 @@ const Header = ({ user }) => {
         logo: Account,
       },
     ];
+    const path = location.pathname.split("/").slice(0, 2).join("/");
     return (
       <NavContainer>
         {listNav &&
           listNav.length > 0 &&
           listNav.map((item, index) => {
             const LogoComponent = item?.logo;
-            const isActive = location.pathname === item.link;
+            const isActive = path === item.link;
             return (
               <NavItem key={index} className={isActive ? "active" : ""}>
                 {
-                  <Link to={item?.link}>
+                  <Link
+                    to={item.link === "/booking" ? "/list-stadium" : item?.link}
+                  >
                     <LogoComponent />
                     {item?.title}
                   </Link>

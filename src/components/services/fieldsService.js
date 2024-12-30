@@ -121,3 +121,14 @@ export const checkPaymentStatus = async (orderCode) => {
     throw error;
   }
 };
+export const updatePaymentSuccess = async (orderCode) => {
+  try {
+    const response = await apiClient.put(`/orders/${orderCode}`, {
+      paymentStatus: "paid",
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    throw error;
+  }
+};
