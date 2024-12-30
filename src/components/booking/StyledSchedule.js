@@ -1216,3 +1216,15 @@ export const FixedSettingPopup = styled.div`
     }
   }
 `;
+export const ErrorMessage = styled.p`
+  color: var(--error-main, #f04438);
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  /* Typography/Subtitle 2 */
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 157%;
+`;

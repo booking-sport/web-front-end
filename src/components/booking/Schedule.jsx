@@ -17,6 +17,7 @@ import {
   createOrder,
   getPaymentInfoByStadiumId,
   checkPaymentStatus,
+  updatePaymentStatus,
 } from "@components/services/fieldsService";
 import classNames from "classnames";
 import moment from "moment";
@@ -29,6 +30,7 @@ import {
   InputFieldContainer,
   InputField,
   FixedSettingPopup,
+  ErrorMessage,
 } from "./StyledSchedule";
 
 const Schedule = () => {
@@ -430,15 +432,15 @@ const Schedule = () => {
       parsedUser ? parsedUser.phone_number : "",
     );
     const [note, setNote] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState(100);
+    const [paymentMethod, setPaymentMethod] = useState(300);
 
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(300);
+    const [timeLeft, setTimeLeft] = useState(10);
     const [orderStatus, setOrderStatus] = useState(null);
     const [qrCode, setQrCode] = useState("");
     const [orderCode, setOrderCode] = useState("");
-    console.log(qrCode, 999);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleUserName = (e) => {
       setUserName(e.target.value);
@@ -461,8 +463,23 @@ const Schedule = () => {
     const handleClosePopupPayment = () => {
       setPopupPayment(false);
     };
+    const validateForm = () => {
+      if (userName.trim().length < 2) {
+        return "Họ và tên phải có ít nhất 2 ký tự.";
+      }
+      const phoneRegex = /^(?:\+84|0)(?:[1-9])[0-9]{8}$/;
+      if (!phoneRegex.test(userNumber)) {
+        return "Số điện thoại Việt Nam: +84 hoặc 0, tiếp theo là 9 chữ số";
+      }
+      return null;
+    };
     const handleOrders = async (e) => {
       e.preventDefault();
+      const validationError = validateForm();
+      if (validationError) {
+        setErrorMessage(validationError);
+        return;
+      }
       setPopupPayment(true);
 
       const deposit = stadium.deposit !== 0 ? paymentMethod : 0;
@@ -475,7 +492,6 @@ const Schedule = () => {
         userNumber,
       );
       if (result.data) {
-        console.log(result);
         // alert("Orders successfully created");
         setQrCode(result?.data?.qrCode);
         setOrderCode(result?.data?.orderCode);
@@ -506,8 +522,8 @@ const Schedule = () => {
             clearInterval(checkPaymentInterval);
             setOrderStatus("PAID");
             alert("Thanh toán thành công!");
-            const updatedData = await checkPaymentStatus(orderCode);
-            console.log("Updated Payment Info:", updatedData);
+            const updatedData = await updatePaymentStatus(orderCode, "paid");
+            // console.log("Updated Payment Info:", updatedData);
             handleClosePopupPayment();
           }
         } catch (error) {
@@ -520,12 +536,15 @@ const Schedule = () => {
         clearInterval(checkPaymentInterval);
       };
     }, [popupPayment, orderCode]);
-    const handleOrderTimeout = () => {
+    const handleOrderTimeout = async () => {
       if (orderStatus !== "PAID") {
         alert(
           "Đơn hàng đã bị hủy do không thanh toán trong thời gian quy định.",
         );
+        const updatedData = await updatePaymentStatus(orderCode, "canceled");
+        // console.log("Updated Payment Info:", updatedData);
         handleClosePopupPayment();
+        window.location.reload();
       }
     };
 
@@ -535,7 +554,6 @@ const Schedule = () => {
       return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     };
 
-    console.log(popupPayment, 88888);
     return (
       <ScheduleContainer className="payment-container">
         <div className="header">
@@ -568,6 +586,7 @@ const Schedule = () => {
                     />
                   </InputFieldContainer>
                 </div>
+                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 <InputFieldContainer>
                   <TitleField> Ghi chú (cho chủ sân)</TitleField>
                   <InputField

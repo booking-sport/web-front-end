@@ -121,10 +121,10 @@ export const checkPaymentStatus = async (orderCode) => {
     throw error;
   }
 };
-export const updatePaymentSuccess = async (orderCode) => {
+export const updatePaymentStatus = async (orderCode, status) => {
   try {
     const response = await apiClient.put(`/orders/${orderCode}`, {
-      paymentStatus: "paid",
+      paymentStatus: status,
     });
     return response.data;
   } catch (error) {
