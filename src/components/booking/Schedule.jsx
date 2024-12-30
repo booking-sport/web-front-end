@@ -432,11 +432,11 @@ const Schedule = () => {
       parsedUser ? parsedUser.phone_number : "",
     );
     const [note, setNote] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState(300);
+    const [paymentMethod, setPaymentMethod] = useState(100);
 
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(10);
+    const [timeLeft, setTimeLeft] = useState(300);
     const [orderStatus, setOrderStatus] = useState(null);
     const [qrCode, setQrCode] = useState("");
     const [orderCode, setOrderCode] = useState("");
