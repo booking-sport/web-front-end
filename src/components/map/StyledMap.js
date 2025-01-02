@@ -152,7 +152,6 @@ export const FilterContainer = styled.div`
     top: 65px;
     left: 0;
     width: 100%;
-    max-height: 200px;
     overflow-y: auto;
     background: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -161,6 +160,11 @@ export const FilterContainer = styled.div`
     border-radius: 16px;
     background: var(--background-paper, #fff);
     box-shadow: 0px 3px 14px 0px rgba(0, 0, 0, 0.08);
+    max-height: 500px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
     @media (max-width: 767px) {
       top: 50px;
     }
@@ -170,6 +174,84 @@ export const FilterContainer = styled.div`
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .top {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+      a.booking {
+        border-radius: 60px;
+        background: var(--primary-main, #1d9a6c);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        border: 0;
+        display: flex;
+        align-items: center;
+        color: var(--primary-contrast, #fff);
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        gap: 8px;
+        text-decoration: none;
+        padding: 6px 16px;
+        white-space: nowrap;
+      }
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        h3.name {
+          color: #000;
+
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          /* Typography/Subtitle 1 */
+          font-family: Inter;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 157%;
+        }
+      }
+    }
+    .address {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      span {
+        color: var(--text-secondary, #4d5761);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Typography/Caption */
+        font-family: Inter;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 166%;
+        white-space: nowrap;
+        position: relative;
+
+        &:not(:last-child):after {
+          content: "";
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          right: -14px;
+          top: 43%;
+          border-radius: 10px;
+          background-color: #4d5761;
+        }
+      }
+    }
   }
 
   .popup-item:hover {

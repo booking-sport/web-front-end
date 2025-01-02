@@ -81,7 +81,6 @@ const Map = () => {
   };
   const FieldDetail = ({ field, onClose }) => {
     if (!field) return null;
-    console.log(field);
     const ratingCount = field?.ratings?.reduce(
       (acc, field) => acc + field.count,
       0,
@@ -378,20 +377,68 @@ const Map = () => {
           {showPopup && (
             <div className="popup-bar">
               {filterResults.length > 0 ? (
-                filterResults.map((field) => (
-                  <div
-                    key={field.id}
-                    className="popup-item"
-                    onClick={() => {
-                      setShowPopup(false);
-                      setSelectedField(field);
-                      onShowFieldDetail();
-                    }}
-                  >
-                    {field.name}
-                    {field.rate}
-                  </div>
-                ))
+                filterResults.map((field) => {
+                  const ratingCount = field?.ratings?.reduce(
+                    (acc, field) => acc + field.count,
+                    0,
+                  );
+                  const totalRate = field?.ratings?.reduce(
+                    (acc, field) => acc + field.rate * field.count,
+                    0,
+                  );
+
+                  const ratingScore =
+                    ratingCount > 0 ? totalRate / ratingCount : 0;
+
+                  function fieldType(type) {
+                    if (type === "football") {
+                      return "Sân bóng đá";
+                    } else if (type === "volleyball") {
+                      return "Sân bóng chuyền";
+                    } else if (type === "badminton") {
+                      return "Sân cầu lông";
+                    } else if (type === "tennis") {
+                      return "Sân tennis";
+                    } else if (type === "complex") {
+                      return "Sân phức hợp";
+                    } else if (type === "basketball") {
+                      return "Sân bóng rổ";
+                    }
+                    return "";
+                  }
+                  return (
+                    <div
+                      key={field.id}
+                      className="popup-item"
+                      onClick={() => {
+                        setShowPopup(false);
+                        setSelectedField(field);
+                        onShowFieldDetail();
+                      }}
+                    >
+                      <div className="top">
+                        <div className="info">
+                          <h3 className="name">{field.name}</h3>
+                          <RateDisplay
+                            score={ratingScore}
+                            count={ratingCount}
+                          />
+                        </div>
+                        <a href={`/booking/${field.id}`} className="booking">
+                          <BookIcon />
+                          <span>Đặt lịch</span>
+                        </a>
+                      </div>
+                      <div className="address">
+                        <span>{fieldType(field.stadium_type)}</span>
+                        <span>{field.address}</span>
+                        <span>
+                          {field.open_time} - {field.close_time}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="popup-item">Không tìm thấy sân</div>
               )}
@@ -535,10 +582,10 @@ const Map = () => {
   );
 
   useEffect(() => {
-    if (nameSearch.trim() === "") {
-      setFilterResults([]);
-      return;
-    }
+    // if (nameSearch.trim() === "") {
+    //   setFilterResults([]);
+    //   return;
+    // }
     fetchFieldsFilter(type, nameSearch, setFilterResults, setError, setLoading);
   }, [type, nameSearch]);
   return (
