@@ -306,6 +306,7 @@ export const ScheduleContainer = styled.div`
     }
   }
   &.schedule-container {
+    @media (max-width:767px){
      .header .title h3.name {
         font-size: 24px;
       }
@@ -328,6 +329,7 @@ export const ScheduleContainer = styled.div`
           }
         }
       }
+    }
     }
     &.payment-container {
       .content-container {

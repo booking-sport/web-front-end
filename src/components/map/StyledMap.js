@@ -273,6 +273,13 @@ export const FilterContainer = styled.div`
     background: var(--background-paper, #fff);
     box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    > div {
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 `;
 export const SortContainer = styled.div`
