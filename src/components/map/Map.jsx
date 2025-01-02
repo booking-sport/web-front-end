@@ -12,6 +12,7 @@ import {
   TelIcon,
   TimeIcon,
   CloseIcon,
+  BookIcon,
 } from "@components/icons/svg";
 import maplibregl from "maplibre-gl";
 import ReactDOMServer from "react-dom/server";
@@ -46,7 +47,6 @@ const Map = () => {
   const [selectedStadium, setSelectedStadium] = useState(null);
 
   const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY || "";
-
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
       const fullStars = Math.floor(score);
@@ -79,12 +79,20 @@ const Map = () => {
       </RateDisplayContainer>
     );
   };
-
   const FieldDetail = ({ field, onClose }) => {
     if (!field) return null;
-    const ratingScore = 4.5;
-    const ratingCount = 150;
-    console.log(field, 999);
+    console.log(field);
+    const ratingCount = field?.ratings?.reduce(
+      (acc, field) => acc + field.count,
+      0,
+    );
+    const totalRate = field?.ratings?.reduce(
+      (acc, field) => acc + field.rate * field.count,
+      0,
+    );
+
+    const ratingScore = ratingCount > 0 ? totalRate / ratingCount : 0;
+
     return (
       <FieldDetailContainer>
         {onClose && (
@@ -105,17 +113,24 @@ const Map = () => {
                 <RateDisplay score={ratingScore} count={ratingCount} />
               </div>
             </div>
-            <div className="direction"> </div>
+            <a href={`/booking/${field.id}`} className="booking">
+              <BookIcon />
+              <span>Đặt lịch</span>
+            </a>
           </div>
           <div className="mid">
             <div className="address">
-              <AddressIcon />
+              <AddressIcon /> <span>{field.address}</span>
             </div>
             <div className="tel">
               <TelIcon />
+              <span>{field?.owner?.phone_number}</span>
             </div>
             <div className="time">
               <TimeIcon />
+              <span>
+                {field.open_time} - {field.close_time}
+              </span>
             </div>
           </div>
           <div className="bottom">
@@ -175,8 +190,19 @@ const Map = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([longitude, latitude]);
-
-          new maplibregl.Marker({ color: "blue" })
+          function createCustomMarker() {
+            const div = document.createElement("div");
+            div.className = "user-marker";
+            div.style.width = "10px";
+            div.style.height = "10px";
+            div.style.borderRadius = "50%";
+            div.style.backgroundColor = "#4285f4";
+            div.style.border = "2px solid white";
+            div.style.boxShadow = "0 0 12px rgba(66, 133, 244, 0.9)";
+            div.style.position = "relative";
+            return div;
+          }
+          new maplibregl.Marker({ element: createCustomMarker() })
             .setLngLat([longitude, latitude])
             .addTo(map);
         },
@@ -191,6 +217,7 @@ const Map = () => {
   useEffect(() => {
     if (map && fields.length > 0) {
       // const bounds = new maplibregl.LngLatBounds();
+      const popupRefs = [];
       fields.forEach((field) => {
         if (!field.longitude || !field.latitude) return;
         // bounds.extend([field.longitude, field.latitude]);
@@ -221,16 +248,17 @@ const Map = () => {
           div.style.backgroundSize = "cover";
           return div;
         }
-        const popupContent = ReactDOMServer.renderToStaticMarkup(
-          <FieldDetail field={field} />,
-        );
-        const popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-          popupContent,
-        );
-
-        marker.setPopup(popup);
+        // const popupContent = ReactDOMServer.renderToStaticMarkup(
+        //   <FieldDetail field={field} />,
+        // );
+        // const popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+        //   popupContent,
+        // );
+        // marker.setPopup(popup);
         marker.getElement().addEventListener("click", () => {
           handleStadiumClick(field); // Pass the clicked field's data to the handler
+          setSelectedField(field);
+          onShowFieldDetail();
         });
       });
     }
@@ -476,6 +504,20 @@ const Map = () => {
     };
     fetchFields();
   }, [type]);
+
+  // useEffect(() => {
+  //   const fetchFieldsDetail = async () => {
+  //     try {
+  //       const data = await getFieldDetails(selectedField.id);
+  //       setFieldDetail(data?.data);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchFieldsDetail();
+  // }, [selectedField]);
 
   const fetchFieldsFilter = debounce(
     async (type, nameSearch, setFilterResults, setError, setLoading) => {

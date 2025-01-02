@@ -475,7 +475,7 @@ export const PopupBarContainer = styled.div`
   top: 0;
   right: 0;
   max-width: 640px;
-  width: 50%;
+  width: 100%;
   height: 100%;
   background: #fff;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
@@ -484,7 +484,7 @@ export const PopupBarContainer = styled.div`
   animation: slideIn 0.3s forwards;
   padding: 24px 20px;
   overflow-y: auto;
-
+  box-sizing: border-box;
   @keyframes slideIn {
     from {
       transform: translateX(100%);
@@ -586,11 +586,43 @@ export const PopupBarContainer = styled.div`
           > img {
             object-fit: cover;
             max-width: 100%;
+            height: 100%;
           }
         }
       }
     }
     .rate {
+      .rating-container {
+        display: flex;
+        margin-top: 10px;
+        .rating-progress {
+          display: flex;
+          flex-direction: column;
+          width: 60%;
+          .rating-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+        }
+        .averageRate {
+          width: 40%;
+          color: var(--text-primary, #111927);
+          text-align: center;
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          /* Typography/H5 */
+          font-family: "Plus Jakarta Sans";
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 120%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
     }
   }
   .tab-content.price,

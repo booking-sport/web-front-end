@@ -135,31 +135,31 @@ const Header = ({ user }) => {
         logo: Account,
       },
     ];
-
-    return (
-      <MobileNav className={isMobileNavOpen ? "open" : ""}>
-        <MobileNavOverlay onClick={() => setIsMobileNavOpen(false)} />
-        <div className="mobile-nav-content">
-          {listNav &&
-            listNav.length > 0 &&
-            listNav.map((item, index) => {
-              const LogoComponent = item?.logo;
-              const isActive = location.pathname === item.link;
-              return (
-                <NavItem key={index} className={isActive ? "active" : ""}>
-                  <Link
-                    to={item?.link}
-                    onClick={() => setIsMobileNavOpen(false)}
-                  >
-                    <LogoComponent />
-                    {item?.title}
-                  </Link>
-                </NavItem>
-              );
-            })}
-        </div>
-      </MobileNav>
-    );
+const path = location.pathname.split("/").slice(0, 2).join("/");
+return (
+  <MobileNav className={isMobileNavOpen ? "open" : ""}>
+    <MobileNavOverlay onClick={() => setIsMobileNavOpen(false)} />
+    <div className="mobile-nav-content">
+      {listNav &&
+        listNav.length > 0 &&
+        listNav.map((item, index) => {
+          const LogoComponent = item?.logo;
+          const isActive = location.pathname === item.link;
+          return (
+            <NavItem key={index} className={isActive ? "active" : ""}>
+              <Link
+                to={item.link === "/booking" ? "/list-stadium" : item?.link}
+                onClick={() => setIsMobileNavOpen(false)}
+              >
+                <LogoComponent />
+                {item?.title}
+              </Link>
+            </NavItem>
+          );
+        })}
+    </div>
+  </MobileNav>
+);
   };
   return (
     <HeaderContainer>
@@ -170,7 +170,6 @@ const Header = ({ user }) => {
         <span className="hamburger"></span>
       </MobileNavToggle>
 
-      {/* Nav Mobile */}
       <MobileNavigation />
     </HeaderContainer>
   );

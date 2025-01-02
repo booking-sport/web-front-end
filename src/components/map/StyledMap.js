@@ -250,10 +250,16 @@ export const FieldDetailContainer = styled.div`
     top: 12px;
     right: 16px;
     padding: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
   }
   .stadium-info {
     .top {
       padding: 20px 20px 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
       .name-rate {
         display: flex;
         flex-direction: column;
@@ -284,6 +290,28 @@ export const FieldDetailContainer = styled.div`
           line-height: 166%;
         }
       }
+      .booking {
+        border-radius: 60px;
+        background: var(--primary-main, #1d9a6c);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        border: 0;
+        display: flex;
+        align-items: center;
+        color: var(--primary-contrast, #fff);
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        gap: 8px;
+        text-decoration: none;
+        padding: 6px 16px;
+        white-space: nowrap;
+      }
+      @media (max-width: 767px) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
     .mid {
       padding: 12px 20px 16px;
@@ -294,6 +322,9 @@ export const FieldDetailContainer = styled.div`
         display: flex;
         align-items: center;
         gap: 8px;
+        svg {
+          min-width: 20px;
+        }
       }
     }
     .bottom {
@@ -324,9 +355,12 @@ export const FieldDetailContainer = styled.div`
           overflow: hidden;
           min-width: 100px;
           height: 150px;
+          max-width: 49%;
+          flex: 1;
           > img {
             object-fit: cover;
             max-width: 100%;
+            height: 100%;
           }
         }
       }
