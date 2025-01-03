@@ -155,7 +155,6 @@ const ListContent = () => {
     setShowPopup(true);
     setSelectedField(stadium);
   };
-  console.log(fieldDetail);
   const closePopup = () => {
     setShowPopup(false);
     setSelectedStadium(null);
@@ -493,7 +492,6 @@ const ListContent = () => {
               (acc, item) => acc + item.count,
               0,
             );
-            console.log(normalizedData);
             const percentages = normalizedData.map((item) => ({
               rate: item.rate,
               percentage: totalCount > 0 ? (item.count / totalCount) * 100 : 0,

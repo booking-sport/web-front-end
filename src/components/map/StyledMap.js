@@ -2,8 +2,14 @@ import styled from "styled-components";
 
 export const MapContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 79px);
   position: relative;
+  @media (max-width: 767px) {
+    height: calc(100vh - 77px);
+  }
+  .maplibregl-ctrl-bottom-right {
+    display: none;
+  }
   .maplibregl-popup {
     transform: unset !important;
     max-width: unset !important;
