@@ -177,6 +177,14 @@ export const ScheduleContainer = styled.div`
         border-radius: 12px;
         border: 1px solid var(--primary-outlineBorder, rgba(29, 154, 108, 0.5));
         background: var(--primary-hovered, rgba(29, 154, 108, 0.04));
+        @media (max-width: 1023px) {
+          position: fixed;
+          top: 100px;
+          background: #fff;
+        }
+        @media (max-width: 1200px) {
+          background: #fff;
+        }
         .popup-order-content {
           display: flex;
           gap: 8px;
@@ -298,112 +306,102 @@ export const ScheduleContainer = styled.div`
     }
   }
   &.schedule-container {
-  }
-  &.payment-container {
-    .content-container {
-      .content {
-        max-width: 920px;
-        margin: 0 auto;
-        border-radius: 0;
-        border: 0;
-        box-shadow: none;
-        background-color: transparent;
-        display: flex;
+    @media (max-width:767px){
+     .header .title h3.name {
+        font-size: 24px;
+      }
+         .header .fixed-booking {
+        font-size: 13px;
+      }
+      .header {
         flex-direction: column;
-        gap: 10px;
-        .content-header {
-          justify-content: flex-start;
-          align-items: flex-start;
-          border-radius: 16px;
-          border: 1px solid var(--divider, #d6d6e1);
-          box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
-          overflow: hidden;
-          background: var(--background-paper, #fff);
-          padding: 20px;
-          .title {
-            color: var(--text-primary, #111927);
-            font-feature-settings:
-              "liga" off,
-              "clig" off;
-            /* Typography/H6 */
-            font-family: "Plus Jakarta Sans";
-            font-size: 18px;
-            font-style: normal;
-            font-weight: 700;
-            line-height: 120%;
-            margin-bottom: 20px;
+      }
+       .unit-status {
+        .unit-item {
+          flex-direction: column;
+          flex: 1;
+          .text-status {
+            font-size: 13px;
+            text-align: center;
           }
-          .info {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            .name-number {
-              display: flex;
-              gap: 12px;
-              > div {
-                flex: 1;
-              }
-            }
+          .color.white {
+            box-sizing: border-box;
           }
         }
-        .content-info {
-          border-radius: 16px;
-          border: 1px solid var(--divider, #d6d6e1);
-          box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
-          overflow: hidden;
-          background: var(--background-paper, #fff);
-          padding: 20px;
-          .title {
-            color: var(--text-primary, #111927);
-            font-feature-settings:
-              "liga" off,
-              "clig" off;
-            /* Typography/H6 */
-            font-family: "Plus Jakarta Sans";
-            font-size: 18px;
-            font-style: normal;
-            font-weight: 700;
-            line-height: 120%;
-            margin-bottom: 20px;
-          }
-          .info {
-            .stadium,
-            .address {
+      }
+    }
+    }
+    &.payment-container {
+      .content-container {
+        .content {
+          max-width: 920px;
+          margin: 0 auto;
+          border-radius: 0;
+          border: 0;
+          box-shadow: none;
+          background-color: transparent;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          .content-header {
+            justify-content: flex-start;
+            align-items: flex-start;
+            border-radius: 16px;
+            border: 1px solid var(--divider, #d6d6e1);
+            box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: var(--background-paper, #fff);
+            padding: 20px;
+            .title {
               color: var(--text-primary, #111927);
               font-feature-settings:
                 "liga" off,
                 "clig" off;
-              /* Typography/Subtitle 1 */
-              font-family: Inter;
-              font-size: 16px;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
               font-style: normal;
-              font-weight: 500;
-              line-height: 157%;
-              display: flex;
-              gap: 5px;
-              margin-bottom: 8px;
-              .name-title {
-                color: var(--text-secondary, #4d5761);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/Subtitle 1 */
-                font-family: Inter;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 157%;
-              }
+              font-weight: 700;
+              line-height: 120%;
+              margin-bottom: 20px;
             }
-            .detail-info {
-              border-radius: 12px;
-              background: var(--primary-selected, rgba(29, 154, 108, 0.08));
-              padding: 16px;
+            .info {
               display: flex;
               flex-direction: column;
-              gap: 8px;
-              .date {
+              gap: 12px;
+              width: 100%;
+              .name-number {
+                display: flex;
+                gap: 12px;
+                > div {
+                  flex: 1;
+                }
+              }
+            }
+          }
+          .content-info {
+            border-radius: 16px;
+            border: 1px solid var(--divider, #d6d6e1);
+            box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: var(--background-paper, #fff);
+            padding: 20px;
+            .title {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
+              margin-bottom: 20px;
+            }
+            .info {
+              .stadium,
+              .address {
                 color: var(--text-primary, #111927);
                 font-feature-settings:
                   "liga" off,
@@ -416,17 +414,462 @@ export const ScheduleContainer = styled.div`
                 line-height: 157%;
                 display: flex;
                 gap: 5px;
+                margin-bottom: 8px;
                 .name-title {
                   color: var(--text-secondary, #4d5761);
                   font-feature-settings:
                     "liga" off,
                     "clig" off;
-                  /* Typography/Body 1 */
+                  /* Typography/Subtitle 1 */
                   font-family: Inter;
                   font-size: 16px;
                   font-style: normal;
-                  font-weight: 400;
-                  line-height: 150%;
+                  font-weight: 500;
+                  line-height: 157%;
+                }
+              }
+              .detail-info {
+                border-radius: 12px;
+                background: var(--primary-selected, rgba(29, 154, 108, 0.08));
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                .date {
+                  color: var(--text-primary, #111927);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/Subtitle 1 */
+                  font-family: Inter;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 157%;
+                  display: flex;
+                  gap: 5px;
+                  .name-title {
+                    color: var(--text-secondary, #4d5761);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Body 1 */
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 150%;
+                  }
+                }
+                .order-item {
+                  display: flex;
+                  justify-content: space-between;
+                  > div {
+                    display: flex;
+                    gap: 5px;
+                    .title {
+                      color: var(--text-secondary, #4d5761);
+                      font-feature-settings:
+                        "liga" off,
+                        "clig" off;
+                      /* Typography/Body 2 */
+                      font-family: Inter;
+                      font-size: 14px;
+                      font-style: normal;
+                      font-weight: 400;
+                      line-height: 157%;
+                      margin: 0;
+                    }
+                    .time {
+                      color: var(--text-primary, #111927);
+                      font-feature-settings:
+                        "liga" off,
+                        "clig" off;
+                      /* Typography/Subtitle 2 */
+                      font-family: Inter;
+                      font-size: 14px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: 157%;
+                      margin: 0;
+                    }
+                    .price {
+                      color: var(--error-main, #f04438);
+                      font-feature-settings:
+                        "liga" off,
+                        "clig" off;
+                      /* Typography/Subtitle 2 */
+                      font-family: Inter;
+                      font-size: 14px;
+                      font-style: normal;
+                      font-weight: 500;
+                      line-height: 157%;
+                    }
+                    .delete {
+                      padding: 0;
+                    }
+                  }
+                }
+              }
+              .line {
+                margin: 12px 0;
+                height: 1px;
+                width: 100%;
+                background: #dfe4ec;
+              }
+              .overview {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                > div {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                }
+                .title {
+                  color: var(--text-secondary, #4d5761);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  font-family: Inter;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 157%;
+                  margin: 0;
+                }
+                .total-time {
+                  color: var(--text-primary, #111927);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/Subtitle 1 */
+                  font-family: Inter;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 157%;
+                }
+                .total-price {
+                  color: var(--text-primary, #111927);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/H6 */
+                  font-family: "Plus Jakarta Sans";
+                  font-size: 18px;
+                  font-style: normal;
+                  font-weight: 700;
+                  line-height: 120%;
+                }
+                .payment-method {
+                  color: var(--text-primary, #111927);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/Caption */
+                  font-family: Inter;
+                  font-size: 12px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 166%;
+                }
+                .must-payment {
+                  color: var(--error-main, #f04438);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/H5 */
+                  font-family: "Plus Jakarta Sans";
+                  font-size: 24px;
+                  font-style: normal;
+                  font-weight: 700;
+                  line-height: 120%;
+                }
+              }
+            }
+          }
+          .button-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            button {
+              flex: 1;
+              width: 100%;
+              padding: 8px;
+              &.back {
+                border-radius: 60px;
+                border: 1px solid
+                  var(--primary-outlineBorder, rgba(29, 154, 108, 0.5));
+                background: var(--background-paper, #fff);
+                color: var(--primary-main, #1d9a6c);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Components/Button Large */
+                font-family: Inter;
+                font-size: 15px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 26px;
+              }
+              &.confirm-payment {
+                border-radius: 60px;
+                background: var(--primary-main, #1d9a6c);
+                /* elevation/1 */
+                box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                color: var(--primary-contrast, #fff);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Components/Button Large */
+                font-family: Inter;
+                font-size: 15px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 26px;
+              }
+            }
+          }
+        }
+      }
+      .dialog-container {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.55);
+        .dialog {
+          border-radius: 20px;
+          background: var(--background-paper, #fff);
+          box-shadow: 0px 9px 46px 0px rgba(0, 0, 0, 0.08);
+          width: 100%;
+          max-width: 704px;
+          &-header {
+            padding: 32px 24px 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .title {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
+            }
+            .close {
+              padding: 0;
+            }
+          }
+          &-footer {
+            display: flex;
+            padding: 16px 24px;
+            gap: 12px;
+            justify-content: flex-end;
+            .cancel {
+              padding: 8px 22px;
+              border-radius: 60px;
+              background: var(--secondary-main, #6c737f);
+              /* elevation/1 */
+              box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+              color: var(--secondary-contrast, #fff);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Components/Button Large */
+              font-family: Inter;
+              font-size: 15px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 26px;
+            }
+            .confirm {
+              padding: 8px 22px;
+              border-radius: 60px;
+              background: var(--primary-main, #1d9a6c);
+              /* elevation/1 */
+              box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+              color: var(--primary-contrast, #fff);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Components/Button Large */
+              font-family: Inter;
+              font-size: 15px;
+              font-style: normal;
+              font-weight: 600;
+              line-height: 26px;
+            }
+          }
+          &-content {
+            padding: 12px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            .title {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Components/Input Text */
+              font-family: Inter;
+              font-size: 14px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 24px; /* 171.429% */
+              letter-spacing: 0.15px;
+            }
+            .bank-info {
+              display: flex;
+              gap: 12px;
+              img {
+                max-width: 155px;
+              }
+              .info {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                &-item {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  .title {
+                    color: var(--text-secondary, #4d5761);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Body 2 */
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 157%;
+                  }
+                  .value {
+                    color: var(--text-primary, #111927);
+                    text-align: right;
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Subtitle 2 */
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 157%;
+                  }
+                }
+              }
+            }
+          }
+          .order-detail {
+            border-radius: 12px;
+            border: 1px solid var(--divider, #dfe4ec);
+            background: var(--background-paper-tertiary, #f8f9fa);
+            padding: 12px 20px;
+            display: flex;
+            gap: 20px;
+            flex-direction: column;
+            .title {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              color: #000;
+
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/Subtitle 1 */
+              font-family: Inter;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: 157%;
+              > button {
+                transform: unset;
+                &.show {
+                  transform: rotate(90deg);
+                }
+              }
+            }
+            .order-detail-content {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              .stadium-info {
+                .stadium-name,
+                .stadium-address {
+                  display: flex;
+                  gap: 8px;
+                  .title {
+                    color: var(--text-secondary, #4d5761);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Subtitle 1 */
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 157%;
+                  }
+                  .value {
+                    color: var(--text-primary, #111927);
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Subtitle 1 */
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: 157%;
+                  }
+                }
+              }
+              .order-detail {
+                padding: 16px;
+                border-radius: 12px;
+                background: var(--primary-selected, rgba(29, 154, 108, 0.08));
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                .date {
+                  color: var(--text-primary, #111927);
+                  font-feature-settings:
+                    "liga" off,
+                    "clig" off;
+                  /* Typography/Subtitle 1 */
+                  font-family: Inter;
+                  font-size: 16px;
+                  font-style: normal;
+                  font-weight: 500;
+                  line-height: 157%;
+                  .name-title {
+                    font-feature-settings:
+                      "liga" off,
+                      "clig" off;
+                    /* Typography/Body 1 */
+                    font-family: Inter;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: 150%;
+                  }
                 }
               }
               .order-item {
@@ -479,155 +922,87 @@ export const ScheduleContainer = styled.div`
                 }
               }
             }
-            .line {
-              margin: 12px 0;
-              height: 1px;
-              width: 100%;
-              background: #dfe4ec;
-            }
-            .overview {
-              display: flex;
-              flex-direction: column;
-              gap: 8px;
-              > div {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              }
-              .title {
-                color: var(--text-secondary, #4d5761);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                font-family: Inter;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 157%;
-                margin: 0;
-              }
-              .total-time {
-                color: var(--text-primary, #111927);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/Subtitle 1 */
-                font-family: Inter;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 157%;
-              }
-              .total-price {
-                color: var(--text-primary, #111927);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/H6 */
-                font-family: "Plus Jakarta Sans";
-                font-size: 18px;
-                font-style: normal;
-                font-weight: 700;
-                line-height: 120%;
-              }
-              .payment-method {
-                color: var(--text-primary, #111927);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/Caption */
-                font-family: Inter;
-                font-size: 12px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 166%;
-              }
-              .must-payment {
-                color: var(--error-main, #f04438);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/H5 */
-                font-family: "Plus Jakarta Sans";
-                font-size: 24px;
-                font-style: normal;
-                font-weight: 700;
-                line-height: 120%;
-              }
-            }
           }
         }
-        .button-actions {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          button {
-            flex: 1;
-            width: 100%;
-            padding: 8px;
-            &.back {
-              border-radius: 60px;
-              border: 1px solid
-                var(--primary-outlineBorder, rgba(29, 154, 108, 0.5));
-              background: var(--background-paper, #fff);
-              color: var(--primary-main, #1d9a6c);
+        .price-info {
+          .total-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .title {
+              color: var(--text-primary, #111927);
               font-feature-settings:
                 "liga" off,
                 "clig" off;
-              /* Components/Button Large */
+              /* Typography/Subtitle 1 */
               font-family: Inter;
-              font-size: 15px;
+              font-size: 16px;
               font-style: normal;
-              font-weight: 600;
-              line-height: 26px;
+              font-weight: 500;
+              line-height: 157%;
             }
-            &.confirm-payment {
-              border-radius: 60px;
-              background: var(--primary-main, #1d9a6c);
-              /* elevation/1 */
-              box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-              color: var(--primary-contrast, #fff);
+            .value {
+              color: var(--text-primary, #111927);
               font-feature-settings:
                 "liga" off,
                 "clig" off;
-              /* Components/Button Large */
-              font-family: Inter;
-              font-size: 15px;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
               font-style: normal;
-              font-weight: 600;
-              line-height: 26px;
+              font-weight: 700;
+              line-height: 120%;
+            }
+          }
+          .deposit {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .title {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
+            }
+            .value {
+              color: var(--error-main, #f04438);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H5 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 24px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
             }
           }
         }
-      }
-    }
-    .dialog-container {
-      width: 100vw;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.55);
-      .dialog {
-        border-radius: 20px;
-        background: var(--background-paper, #fff);
-        box-shadow: 0px 9px 46px 0px rgba(0, 0, 0, 0.08);
-        width: 100%;
-        max-width: 704px;
-        &-header {
-          padding: 32px 24px 16px 24px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          .title {
-            color: var(--text-primary, #111927);
+        .message {
+          border-radius: 12px;
+          background: var(--warning-lightest, #fffaeb);
+          padding: 12px;
+          text-align: center;
+          color: var(--warning-dark, #b54708);
+          text-align: center;
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          /* Typography/Body 2 */
+          font-family: Inter;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 157%;
+          .time {
+            color: var(--warning-dark, #b54708);
+            text-align: center;
             font-feature-settings:
               "liga" off,
               "clig" off;
@@ -638,339 +1013,9 @@ export const ScheduleContainer = styled.div`
             font-weight: 700;
             line-height: 120%;
           }
-          .close {
-            padding: 0;
-          }
         }
-        &-footer{
-            display: flex;
-            padding:16px 24px;
-            gap:12px;
-            justify-content:flex-end;
-            .cancel{
-                padding: 8px 22px;
-                border-radius: 60px;
-                background: var(--secondary-main, #6C737F);
-                /* elevation/1 */
-                box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
-                color: var(--secondary-contrast, #FFF);
-                font-feature-settings: 'liga' off, 'clig' off;
-                /* Components/Button Large */
-                font-family: Inter;
-                font-size: 15px;
-                font-style: normal;
-                font-weight: 600;
-                line-height: 26px;
-            }
-            .confirm{
-                    padding: 8px 22px;
-                    border-radius: 60px;
-                    background: var(--primary-main, #1D9A6C);
-                    /* elevation/1 */
-                    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
-                    color: var(--primary-contrast, #FFF);
-                    font-feature-settings: 'liga' off, 'clig' off;
-                    /* Components/Button Large */
-                    font-family: Inter;
-                    font-size: 15px;
-                    font-style: normal;
-                    font-weight: 600;
-                    line-height: 26px;
-            }
-        }
-        &-content {
-          padding: 12px 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          .title {
-            color: var(--text-primary, #111927);
-            font-feature-settings:
-              "liga" off,
-              "clig" off;
-            /* Components/Input Text */
-            font-family: Inter;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 24px; /* 171.429% */
-            letter-spacing: 0.15px;
-          }
-          .bank-info {
-            display: flex;
-            gap: 12px;
-            img {
-              max-width: 155px;
-            }
-            .info {
-              width: 100%;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-around;
-              &-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                .title {
-                  color: var(--text-secondary, #4d5761);
-                  font-feature-settings:
-                    "liga" off,
-                    "clig" off;
-                  /* Typography/Body 2 */
-                  font-family: Inter;
-                  font-size: 14px;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: 157%;
-                }
-                .value {
-                  color: var(--text-primary, #111927);
-                  text-align: right;
-                  font-feature-settings:
-                    "liga" off,
-                    "clig" off;
-                  /* Typography/Subtitle 2 */
-                  font-family: Inter;
-                  font-size: 14px;
-                  font-style: normal;
-                  font-weight: 500;
-                  line-height: 157%;
-                }
-              }
-            }
-          }
-        }
-        .order-detail {
-          border-radius: 12px;
-          border: 1px solid var(--divider, #dfe4ec);
-          background: var(--background-paper-tertiary, #f8f9fa);
-          padding: 12px 20px;
-          display: flex;
-          gap: 20px;
-          flex-direction: column;
-          .title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #000;
-
-            font-feature-settings:
-              "liga" off,
-              "clig" off;
-            /* Typography/Subtitle 1 */
-            font-family: Inter;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: 157%;
-            >button{
-                transform: unset;
-                &.show{
-                    transform: rotate(90deg);
-                }
-            }
-          }
-          .order-detail-content {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            .stadium-info {
-              .stadium-name,
-              .stadium-address {
-                display: flex;
-                gap: 8px;
-                .title {
-                  color: var(--text-secondary, #4d5761);
-                  font-feature-settings:
-                    "liga" off,
-                    "clig" off;
-                  /* Typography/Subtitle 1 */
-                  font-family: Inter;
-                  font-size: 16px;
-                  font-style: normal;
-                  font-weight: 500;
-                  line-height: 157%;
-                }
-                .value {
-                  color: var(--text-primary, #111927);
-                  font-feature-settings:
-                    "liga" off,
-                    "clig" off;
-                  /* Typography/Subtitle 1 */
-                  font-family: Inter;
-                  font-size: 16px;
-                  font-style: normal;
-                  font-weight: 500;
-                  line-height: 157%;
-                }
-              }
-            }
-            .order-detail {
-              padding: 16px;
-              border-radius: 12px;
-              background: var(--primary-selected, rgba(29, 154, 108, 0.08));
-              display:flex;
-              flex-direction: column;
-              gap:8px;
-              .date {
-                color: var(--text-primary, #111927);
-                font-feature-settings:
-                  "liga" off,
-                  "clig" off;
-                /* Typography/Subtitle 1 */
-                font-family: Inter;
-                font-size: 16px;
-                font-style: normal;
-                font-weight: 500;
-                line-height: 157%;
-                .name-title {
-                  font-feature-settings:
-                    "liga" off,
-                    "clig" off;
-                  /* Typography/Body 1 */
-                  font-family: Inter;
-                  font-size: 16px;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: 150%;
-                }
-              }
-            }
-             .order-item {
-                display: flex;
-                justify-content: space-between;
-                > div {
-                  display: flex;
-                  gap: 5px;
-                  .title {
-                    color: var(--text-secondary, #4d5761);
-                    font-feature-settings:
-                      "liga" off,
-                      "clig" off;
-                    /* Typography/Body 2 */
-                    font-family: Inter;
-                    font-size: 14px;
-                    font-style: normal;
-                    font-weight: 400;
-                    line-height: 157%;
-                    margin: 0;
-                  }
-                  .time {
-                    color: var(--text-primary, #111927);
-                    font-feature-settings:
-                      "liga" off,
-                      "clig" off;
-                    /* Typography/Subtitle 2 */
-                    font-family: Inter;
-                    font-size: 14px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 157%;
-                    margin: 0;
-                  }
-                  .price {
-                    color: var(--error-main, #f04438);
-                    font-feature-settings:
-                      "liga" off,
-                      "clig" off;
-                    /* Typography/Subtitle 2 */
-                    font-family: Inter;
-                    font-size: 14px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 157%;
-                  }
-                  .delete {
-                    padding: 0;
-                  }
-                }
-              }
-            }
-          }
-        }
-        .price-info{
-            .total-price{
-                display:flex;
-                justify-content: space-between;
-                align-items: center;
-                .title{
-                    color: var(--text-primary, #111927);
-                    font-feature-settings: 'liga' off, 'clig' off;
-                    /* Typography/Subtitle 1 */
-                    font-family: Inter;
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: 157%;
-                }
-                .value{
-                    color: var(--text-primary, #111927);
-                    font-feature-settings: 'liga' off, 'clig' off;
-                    /* Typography/H6 */
-                    font-family: "Plus Jakarta Sans";
-                    font-size: 18px;
-                    font-style: normal;
-                    font-weight: 700;
-                    line-height: 120%;
-                }
-            }
-            .deposit{
-                display:flex;
-                justify-content: space-between;
-                align-items: center;
-                .title{
-                    color: var(--text-primary, #111927);
-                    font-feature-settings: 'liga' off, 'clig' off;
-                    /* Typography/H6 */
-                    font-family: "Plus Jakarta Sans";
-                    font-size: 18px;
-                    font-style: normal;
-                    font-weight: 700;
-                    line-height: 120%;
-                }
-                .value{
-                    color: var(--error-main, #F04438);
-                    font-feature-settings: 'liga' off, 'clig' off;
-                    /* Typography/H5 */
-                    font-family: "Plus Jakarta Sans";
-                    font-size: 24px;
-                    font-style: normal;
-                    font-weight: 700;
-                    line-height: 120%;
-                }
-            }
-        }
-        .message{
-            border-radius: 12px;
-            background: var(--warning-lightest, #FFFAEB);
-            padding:12px;
-            text-align: center;
-            color: var(--warning-dark, #B54708);
-            text-align: center;
-            font-feature-settings: 'liga' off, 'clig' off;
-            /* Typography/Body 2 */
-            font-family: Inter;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 157%;
-            .time{
-                color: var(--warning-dark, #B54708);
-                text-align: center;
-                font-feature-settings: 'liga' off, 'clig' off;
-                /* Typography/H6 */
-                font-family: "Plus Jakarta Sans";
-                font-size: 18px;
-                font-style: normal;
-                font-weight: 700;
-                line-height: 120%; 
-            }
-        }
-        
       }
-      
     }
-    
   }
 
   .table-container {
@@ -1026,7 +1071,10 @@ export const ScheduleContainer = styled.div`
     left: 0;
     background: #fff;
     z-index: 1;
-    min-width: 100px;
+    min-width: 70px;
+    @media (min-width: 768px) {
+      min-width: 100px;
+    }
   }
   table {
     border-left: none;
@@ -1215,4 +1263,16 @@ export const FixedSettingPopup = styled.div`
       }
     }
   }
+`;
+export const ErrorMessage = styled.p`
+  color: var(--error-main, #f04438);
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  /* Typography/Subtitle 2 */
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 157%;
 `;

@@ -8,7 +8,6 @@ export const login = async (username, password) => {
     });
     const responseData = response.data;
     if (responseData) {
-      console.log(responseData.data);
       Cookies.set("jwt", responseData.data.token, { expires: 1 });
       localStorage.setItem("user", JSON.stringify(responseData.data.user));
       return { success: true, user: responseData.data.user };

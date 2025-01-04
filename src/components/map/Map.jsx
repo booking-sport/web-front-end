@@ -12,6 +12,7 @@ import {
   TelIcon,
   TimeIcon,
   CloseIcon,
+  BookIcon,
 } from "@components/icons/svg";
 import maplibregl from "maplibre-gl";
 import ReactDOMServer from "react-dom/server";
@@ -45,8 +46,7 @@ const Map = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedStadium, setSelectedStadium] = useState(null);
 
-  const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY;
-
+  const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY || "";
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
       const fullStars = Math.floor(score);
@@ -79,12 +79,19 @@ const Map = () => {
       </RateDisplayContainer>
     );
   };
-
   const FieldDetail = ({ field, onClose }) => {
     if (!field) return null;
-    const ratingScore = 4.5;
-    const ratingCount = 150;
-    console.log(field, 999);
+    const ratingCount = field?.ratings?.reduce(
+      (acc, field) => acc + field.count,
+      0,
+    );
+    const totalRate = field?.ratings?.reduce(
+      (acc, field) => acc + field.rate * field.count,
+      0,
+    );
+
+    const ratingScore = ratingCount > 0 ? totalRate / ratingCount : 0;
+
     return (
       <FieldDetailContainer>
         {onClose && (
@@ -105,17 +112,24 @@ const Map = () => {
                 <RateDisplay score={ratingScore} count={ratingCount} />
               </div>
             </div>
-            <div className="direction"> </div>
+            <a href={`/booking/${field.id}`} className="booking">
+              <BookIcon />
+              <span>Đặt lịch</span>
+            </a>
           </div>
           <div className="mid">
             <div className="address">
-              <AddressIcon />
+              <AddressIcon /> <span>{field.address}</span>
             </div>
             <div className="tel">
               <TelIcon />
+              <span>{field?.owner?.phone_number}</span>
             </div>
             <div className="time">
               <TimeIcon />
+              <span>
+                {field.open_time} - {field.close_time}
+              </span>
             </div>
           </div>
           <div className="bottom">
@@ -154,6 +168,19 @@ const Map = () => {
 
     return () => mapInstance.remove();
   }, [fields]);
+
+  const handleFocusOnUserLocation = () => {
+    if (map && userLocation) {
+      map.flyTo({
+        center: userLocation,
+        zoom: 14,
+        essential: true,
+      });
+    } else {
+      alert("User location not available");
+    }
+  };
+
   useEffect(() => {
     if (!map) return;
 
@@ -162,8 +189,19 @@ const Map = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([longitude, latitude]);
-
-          new maplibregl.Marker({ color: "blue" })
+          function createCustomMarker() {
+            const div = document.createElement("div");
+            div.className = "user-marker";
+            div.style.width = "10px";
+            div.style.height = "10px";
+            div.style.borderRadius = "50%";
+            div.style.backgroundColor = "#4285f4";
+            div.style.border = "2px solid white";
+            div.style.boxShadow = "0 0 12px rgba(66, 133, 244, 0.9)";
+            div.style.position = "relative";
+            return div;
+          }
+          new maplibregl.Marker({ element: createCustomMarker() })
             .setLngLat([longitude, latitude])
             .addTo(map);
         },
@@ -178,6 +216,7 @@ const Map = () => {
   useEffect(() => {
     if (map && fields.length > 0) {
       // const bounds = new maplibregl.LngLatBounds();
+      const popupRefs = [];
       fields.forEach((field) => {
         if (!field.longitude || !field.latitude) return;
         // bounds.extend([field.longitude, field.latitude]);
@@ -208,16 +247,17 @@ const Map = () => {
           div.style.backgroundSize = "cover";
           return div;
         }
-        const popupContent = ReactDOMServer.renderToStaticMarkup(
-          <FieldDetail field={field} />,
-        );
-        const popup = new maplibregl.Popup({ offset: 25 }).setHTML(
-          popupContent,
-        );
-
-        marker.setPopup(popup);
+        // const popupContent = ReactDOMServer.renderToStaticMarkup(
+        //   <FieldDetail field={field} />,
+        // );
+        // const popup = new maplibregl.Popup({ offset: 25 }).setHTML(
+        //   popupContent,
+        // );
+        // marker.setPopup(popup);
         marker.getElement().addEventListener("click", () => {
           handleStadiumClick(field); // Pass the clicked field's data to the handler
+          setSelectedField(field);
+          onShowFieldDetail();
         });
       });
     }
@@ -258,8 +298,8 @@ const Map = () => {
             "line-cap": "round",
           },
           paint: {
-            "line-color": "#ff0000",
-            "line-width": 4,
+            "line-color": "#0f53ff",
+            "line-width": 9,
           },
         };
 
@@ -293,12 +333,12 @@ const Map = () => {
       useEffect(() => {
         const debouncedSearch = debounce(() => {
           onSearch(localName);
-        }, 300);
+        }, 1000);
 
         debouncedSearch();
         return () => debouncedSearch.cancel();
       }, [localName, onSearch]);
-
+      const containerRef = useRef(null);
       const handleInputChange = (e) => {
         setLocalName(e.target.value);
       };
@@ -306,8 +346,24 @@ const Map = () => {
         setShowPopup(true);
       };
 
+      useEffect(() => {
+        const handleClickOutside = (event) => {
+          if (
+            containerRef.current &&
+            !containerRef.current.contains(event.target)
+          ) {
+            setShowPopup(false);
+          }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, []);
       return (
-        <FilterContainer>
+        <FilterContainer ref={containerRef}>
           <input
             type="text"
             placeholder="Tìm kiếm sân..."
@@ -321,19 +377,68 @@ const Map = () => {
           {showPopup && (
             <div className="popup-bar">
               {filterResults.length > 0 ? (
-                filterResults.map((field) => (
-                  <div
-                    key={field.id}
-                    className="popup-item"
-                    onClick={() => {
-                      setShowPopup(false);
-                      setSelectedField(field);
-                      onShowFieldDetail();
-                    }}
-                  >
-                    {field.name}
-                  </div>
-                ))
+                filterResults.map((field) => {
+                  const ratingCount = field?.ratings?.reduce(
+                    (acc, field) => acc + field.count,
+                    0,
+                  );
+                  const totalRate = field?.ratings?.reduce(
+                    (acc, field) => acc + field.rate * field.count,
+                    0,
+                  );
+
+                  const ratingScore =
+                    ratingCount > 0 ? totalRate / ratingCount : 0;
+
+                  function fieldType(type) {
+                    if (type === "football") {
+                      return "Sân bóng đá";
+                    } else if (type === "volleyball") {
+                      return "Sân bóng chuyền";
+                    } else if (type === "badminton") {
+                      return "Sân cầu lông";
+                    } else if (type === "tennis") {
+                      return "Sân tennis";
+                    } else if (type === "complex") {
+                      return "Sân phức hợp";
+                    } else if (type === "basketball") {
+                      return "Sân bóng rổ";
+                    }
+                    return "";
+                  }
+                  return (
+                    <div
+                      key={field.id}
+                      className="popup-item"
+                      onClick={() => {
+                        setShowPopup(false);
+                        setSelectedField(field);
+                        onShowFieldDetail();
+                      }}
+                    >
+                      <div className="top">
+                        <div className="info">
+                          <h3 className="name">{field.name}</h3>
+                          <RateDisplay
+                            score={ratingScore}
+                            count={ratingCount}
+                          />
+                        </div>
+                        <a href={`/booking/${field.id}`} className="booking">
+                          <BookIcon />
+                          <span>Đặt lịch</span>
+                        </a>
+                      </div>
+                      <div className="address">
+                        <span>{fieldType(field.stadium_type)}</span>
+                        <span>{field.address}</span>
+                        <span>
+                          {field.open_time} - {field.close_time}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
               ) : (
                 <div className="popup-item">Không tìm thấy sân</div>
               )}
@@ -447,6 +552,20 @@ const Map = () => {
     fetchFields();
   }, [type]);
 
+  // useEffect(() => {
+  //   const fetchFieldsDetail = async () => {
+  //     try {
+  //       const data = await getFieldDetails(selectedField.id);
+  //       setFieldDetail(data?.data);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchFieldsDetail();
+  // }, [selectedField]);
+
   const fetchFieldsFilter = debounce(
     async (type, nameSearch, setFilterResults, setError, setLoading) => {
       try {
@@ -459,19 +578,27 @@ const Map = () => {
         setLoading(false);
       }
     },
-    300,
+    1000,
   );
 
   useEffect(() => {
-    if (nameSearch.trim() === "") {
-      setFilterResults([]);
-      return;
-    }
+    // if (nameSearch.trim() === "") {
+    //   setFilterResults([]);
+    //   return;
+    // }
     fetchFieldsFilter(type, nameSearch, setFilterResults, setError, setLoading);
   }, [type, nameSearch]);
   return (
     <MapContainer className="map-container" ref={mapContainer}>
       <FilterSort />
+      <div className="focus-location">
+        <button
+          className="focus-user-location-btn"
+          onClick={handleFocusOnUserLocation}
+        >
+          <span></span>
+        </button>
+      </div>
     </MapContainer>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import QRCode from "react-qr-code";
 import {
   ArrowLeftIcon,
   CalendarIcon,
@@ -15,6 +16,8 @@ import {
   getPriceDetails,
   createOrder,
   getPaymentInfoByStadiumId,
+  checkPaymentStatus,
+  updatePaymentStatus,
 } from "@components/services/fieldsService";
 import classNames from "classnames";
 import moment from "moment";
@@ -27,6 +30,7 @@ import {
   InputFieldContainer,
   InputField,
   FixedSettingPopup,
+  ErrorMessage,
 } from "./StyledSchedule";
 
 const Schedule = () => {
@@ -44,11 +48,9 @@ const Schedule = () => {
   const [popupInfo, setPopupInfo] = useState(null);
   const [isFixedBooking, setIsFixedBooking] = useState(false);
   const [isBooking, setIsBooking] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState(100);
   let navigate = useNavigate();
   const [isPopupSettingOpen, setIsPopupSettingOpen] = useState(false);
   const [orderType, setOrderType] = useState("single_booking");
-  const [note, setNote] = useState("");
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [duration, setDuration] = useState(1);
@@ -280,7 +282,7 @@ const Schedule = () => {
     const orders = result.flatMap(({ field, name, times }) =>
       times.map((time) => ({
         orderType: orderType,
-        price: time.price,
+        price: time.price * 1000,
         date: date,
         fieldId: parseInt(field, 10),
         fieldName: name,
@@ -314,10 +316,11 @@ const Schedule = () => {
       updatedFieldNames,
     );
 
-    const totalPrice = Object.values(updatedSlots).reduce(
-      (sum, currentPrice) => sum + currentPrice,
-      0,
-    );
+    const totalPrice =
+      Object.values(updatedSlots).reduce(
+        (sum, currentPrice) => sum + currentPrice,
+        0,
+      ) * 1000;
     const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
 
     setPopupInfo({
@@ -359,10 +362,11 @@ const Schedule = () => {
       updatedFieldNames,
     );
 
-    const totalPrice = Object.values(updatedSlots).reduce(
-      (sum, currentPrice) => sum + currentPrice,
-      0,
-    );
+    const totalPrice =
+      Object.values(updatedSlots).reduce(
+        (sum, currentPrice) => sum + currentPrice,
+        0,
+      ) * 1000;
     const totalTime = orders.reduce((sum, order) => sum + order.duration, 0);
     setPopupInfo({
       groupedData,
@@ -427,8 +431,17 @@ const Schedule = () => {
     const [userNumber, setUserNumber] = useState(
       parsedUser ? parsedUser.phone_number : "",
     );
+    const [note, setNote] = useState("");
+    const [paymentMethod, setPaymentMethod] = useState(100);
+
     const [popupPayment, setPopupPayment] = useState(false);
     const [isShow, setIsShow] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(300);
+    const [orderStatus, setOrderStatus] = useState(null);
+    const [qrCode, setQrCode] = useState("");
+    const [orderCode, setOrderCode] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+
     const handleUserName = (e) => {
       setUserName(e.target.value);
     };
@@ -450,23 +463,95 @@ const Schedule = () => {
     const handleClosePopupPayment = () => {
       setPopupPayment(false);
     };
+    const validateForm = () => {
+      if (userName.trim().length < 2) {
+        return "Họ và tên phải có ít nhất 2 ký tự.";
+      }
+      const phoneRegex = /^(?:\+84|0)(?:[1-9])[0-9]{8}$/;
+      if (!phoneRegex.test(userNumber)) {
+        return "Số điện thoại Việt Nam: +84 hoặc 0, tiếp theo là 9 chữ số";
+      }
+      return null;
+    };
     const handleOrders = async (e) => {
       e.preventDefault();
+      const validationError = validateForm();
+      if (validationError) {
+        setErrorMessage(validationError);
+        return;
+      }
       setPopupPayment(true);
+
+      const deposit = stadium.deposit !== 0 ? paymentMethod : 0;
       const result = await createOrder(
         stadium.id,
         popupInfo.orders,
+        deposit,
         note,
         userName,
         userNumber,
       );
       if (result.data) {
-        console.log(result);
-        alert("Orders successfully created");
+        // alert("Orders successfully created");
+        setQrCode(result?.data?.qrCode);
+        setOrderCode(result?.data?.orderCode);
       } else {
         setError(result.message);
         console.log(error);
       }
+    };
+    useEffect(() => {
+      if (!popupPayment) return;
+
+      const countdownInterval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            handleOrderTimeout();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      const checkPaymentInterval = setInterval(async () => {
+        try {
+          const data = await checkPaymentStatus(orderCode);
+          if (data.status === "PAID") {
+            clearInterval(countdownInterval);
+            clearInterval(checkPaymentInterval);
+            setOrderStatus("PAID");
+            alert("Thanh toán thành công!");
+            const updatedData = await updatePaymentStatus(orderCode, "paid");
+            // console.log("Updated Payment Info:", updatedData);
+            handleClosePopupPayment();
+          }
+        } catch (error) {
+          console.error("Failed to check payment status:", error);
+        }
+      }, 10000);
+
+      return () => {
+        clearInterval(countdownInterval);
+        clearInterval(checkPaymentInterval);
+      };
+    }, [popupPayment, orderCode]);
+    const handleOrderTimeout = async () => {
+      if (orderStatus !== "PAID") {
+        alert(
+          "Đơn hàng đã bị hủy do không thanh toán trong thời gian quy định.",
+        );
+        const updatedData = await updatePaymentStatus(orderCode, "canceled");
+        // console.log("Updated Payment Info:", updatedData);
+        handleClosePopupPayment();
+        window.location.reload();
+      }
+    };
+
+    const formatTime = (seconds) => {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     };
 
     return (
@@ -501,6 +586,7 @@ const Schedule = () => {
                     />
                   </InputFieldContainer>
                 </div>
+                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 <InputFieldContainer>
                   <TitleField> Ghi chú (cho chủ sân)</TitleField>
                   <InputField
@@ -549,7 +635,7 @@ const Schedule = () => {
                           </div>
                           <div>
                             <span className="price">
-                              {(order.price * 1000).toLocaleString("vi-VN")} đ
+                              {order.price.toLocaleString("vi-VN")} đ
                             </span>
                             <button
                               className="delete"
@@ -573,7 +659,7 @@ const Schedule = () => {
                   <div className="total-price">
                     <span className="title">Tổng tiền:</span>
                     <span>
-                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                      {(popupInfo?.totalPrice).toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                   <div className="payment-method">
@@ -587,7 +673,7 @@ const Schedule = () => {
                             <input
                               type="radio"
                               name="paymentMethod"
-                              value="30"
+                              value={stadium.deposit}
                               checked={paymentMethod === stadium.deposit}
                               onChange={() => setPaymentMethod(stadium.deposit)}
                             />
@@ -611,9 +697,7 @@ const Schedule = () => {
                     <span className="title">Số tiền phải trả</span>
                     <span className="price">
                       {(
-                        popupInfo?.totalPrice *
-                        1000 *
-                        (paymentMethod / 100 || 1)
+                        popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                       ).toLocaleString("vi-VN")}{" "}
                       đ
                     </span>
@@ -643,7 +727,7 @@ const Schedule = () => {
               <div className="dialog-content">
                 <span className="title">Quét mã QR hoặc nhập thông tin</span>
                 <div className="bank-info">
-                  <img src="/images/test-qr.PNG" alt="" />
+                  <QRCode value={qrCode} size={155} />
                   <div className="info">
                     <div className="info-item">
                       <span className="title">Chủ tài khoản</span>
@@ -709,10 +793,7 @@ const Schedule = () => {
                                 </div>
                                 <div>
                                   <span className="price">
-                                    {(order.price * 1000).toLocaleString(
-                                      "vi-VN",
-                                    )}{" "}
-                                    đ
+                                    {order.price.toLocaleString("vi-VN")} đ
                                   </span>
                                 </div>
                               </div>
@@ -726,16 +807,14 @@ const Schedule = () => {
                   <div className="total-price">
                     <span className="title">Thành tiền</span>
                     <span className="value">
-                      {(popupInfo?.totalPrice * 1000).toLocaleString("vi-VN")} đ
+                      {(popupInfo?.totalPrice).toLocaleString("vi-VN")} đ
                     </span>
                   </div>
                   <div className="deposit">
                     <span className="title">Cọc trước</span>
                     <span className="value">
                       {(
-                        popupInfo?.totalPrice *
-                        1000 *
-                        (paymentMethod / 100 || 1)
+                        popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                       ).toLocaleString("vi-VN")}{" "}
                       đ
                     </span>
@@ -745,16 +824,14 @@ const Schedule = () => {
                   Vui lòng chuyển khoản{" "}
                   <strong>
                     {(
-                      popupInfo?.totalPrice *
-                      1000 *
-                      (paymentMethod / 100 || 1)
+                      popupInfo?.totalPrice * (paymentMethod / 100 || 1)
                     ).toLocaleString("vi-VN")}{" "}
                   </strong>
-                  đ trong vòng <strong>10 phút</strong> để hoàn tất đặt lịch!
+                  đ trong vòng <strong>5 phút</strong> để hoàn tất đặt lịch!
                   <br />
                   Đơn hàng của bạn còn được giữ chỗ trong:
                   <br />
-                  <span className="time">05:32</span>
+                  <span className="time">{formatTime(timeLeft)}</span>
                 </div>
               </div>
               {/* <div className="dialog-footer">
@@ -996,7 +1073,7 @@ const Schedule = () => {
                           <div className="total-price">
                             <span className="title">Tổng tiền:</span>
                             <span className="price">
-                              {popupInfo.totalPrice}k
+                              {popupInfo.totalPrice.toLocaleString("vi-VN")}đ
                             </span>
                           </div>
                           <button

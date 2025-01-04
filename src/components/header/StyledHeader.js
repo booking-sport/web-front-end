@@ -8,6 +8,7 @@ export const HeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   z-index: 1000;
+  position: relative;
   @media (max-width: 1200px) {
     padding-right: 80px;
   }
@@ -148,9 +149,7 @@ export const MobileNavOverlay = styled.div`
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  z-index: 9;
+  z-index: 100;
   transition:
     opacity 0.3s ease,
     visibility 0.3s ease;
@@ -170,16 +169,20 @@ export const MobileNav = styled.div`
   height: 100%;
   background: #1d9a6c;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  z-index: 1000;
   transition: right 0.3s ease;
-
+  display: none;
   &.open {
     right: 0;
+    display: block;
   }
 
   .mobile-nav-content {
     padding: 20px;
-    margin-top: 20px;
+    position: relative;
+    z-index: 1000;
+    height: 100%;
+    background: #1d9a6c;
     ${NavItem} {
       margin: 10px 0;
       max-width: 180px;

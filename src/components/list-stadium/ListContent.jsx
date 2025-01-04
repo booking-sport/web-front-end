@@ -41,7 +41,12 @@ import {
   TimeContainer,
 } from "./StyledList";
 import { debounce } from "lodash";
-import { getSportsFields } from "@components/services/fieldsService";
+import {
+  getSportsFields,
+  getFieldDetails,
+} from "@components/services/fieldsService";
+
+import { useDebouncedCallback } from "use-debounce";
 const ListContent = () => {
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +54,10 @@ const ListContent = () => {
   const [type, setType] = useState("");
   const [name, setName] = useState("");
   const [activeCategoryId, setActiveCategoryId] = useState();
+  const [fieldDetail, setFieldDetail] = useState();
+  const [selectedField, setSelectedField] = useState();
+  const [selectedStadium, setSelectedStadium] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -63,92 +72,99 @@ const ListContent = () => {
     };
     fetchFields();
   }, [type, name]);
+  useEffect(() => {
+    const fetchFieldsDetail = async () => {
+      try {
+        const data = await getFieldDetails(selectedField.id);
+        setFieldDetail(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFieldsDetail();
+  }, [selectedField]);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [step, setStep] = useState(1);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTime, setSelectedTime] = useState("");
+    const [selectedDateTime, setSelectedDateTime] = useState({
+      date: null,
+      time: "",
+    });
 
-    const openPopup = () => {
-      setIsPopupOpen(!isPopupOpen);
-    };
-
-    const closePopup = () => {
-      setIsPopupOpen(false);
-      setStep(1);
-    };
+    const togglePopup = () => setIsPopupOpen((prev) => !prev);
 
     const handleDateChange = (date) => {
-      setSelectedDate(date);
-      setStep(2);
+      setSelectedDateTime((prev) => ({ ...prev, date }));
     };
 
     const handleTimeChange = (e) => {
       const time = e.target.value;
-      setSelectedTime(e.target.value);
-      if (selectedDate) {
-        closePopup();
-        console.log(`Ngày: ${selectedDate} Giờ: ${time}`);
-      }
+      setSelectedDateTime((prev) => ({ ...prev, time }));
     };
 
-    const swipeHandlers = useSwipeable({
-      onSwipedLeft: () => step === 1 && setStep(2),
-      onSwipedRight: () => step === 2 && setStep(1),
-      trackMouse: true,
-    });
-
+    const closePopup = () => setIsPopupOpen(false);
     return (
       <div className="date-time">
         {isPopupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content" {...swipeHandlers}>
-              {step === 1 && (
-                <div>
-                  <h3>Chọn ngày</h3>
-                  <DatePicker
-                    selected={selectedDate}
-                    onChange={handleDateChange}
-                    dateFormat="dd/MM/yyyy"
-                    inline
-                  />
-                </div>
-              )}
-              {step === 2 && (
-                <div>
-                  <h3>Chọn giờ</h3>
-                  <input
-                    type="time"
-                    value={selectedTime}
-                    onChange={handleTimeChange}
-                  />
-                </div>
-              )}
+          <div className="popup-overlay" onClick={closePopup}>
+            <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+              <h3>Chọn ngày và giờ</h3>
+              <div className="date-picker">
+                <DatePicker
+                  selected={selectedDateTime.date}
+                  onChange={handleDateChange}
+                  dateFormat="dd/MM/yyyy"
+                  inline
+                  minDate={new Date()}
+                />
+              </div>
+              <div className="time-picker">
+                <label htmlFor="time">Giờ:</label>
+                <input
+                  type="time"
+                  id="time"
+                  value={selectedDateTime.time}
+                  onChange={handleTimeChange}
+                />
+              </div>
+              <button className="btn-close" onClick={closePopup}>
+                Đóng
+              </button>
             </div>
           </div>
         )}
         <p className="text-time">
-          {selectedDate && selectedTime ? (
+          {selectedDateTime.date && selectedDateTime.time ? (
             <>
-              {selectedDate.toLocaleDateString()} {selectedTime}
+              {selectedDateTime.date.toLocaleDateString()}{" "}
+              {selectedDateTime.time}
             </>
           ) : (
             "Tất cả"
           )}
         </p>
-        <button className="btn-select-time" onClick={openPopup}>
+        <button className="btn-select-time" onClick={togglePopup}>
           <CalendarIcon />
         </button>
       </div>
     );
   };
-
+  const handleDetailClick = (stadium) => {
+    setSelectedStadium(stadium);
+    setShowPopup(true);
+    setSelectedField(stadium);
+  };
+  const closePopup = () => {
+    setShowPopup(false);
+    setSelectedStadium(null);
+  };
   const ListHeader = ({ value, onSearch }) => {
     const [localName, setLocalName] = useState(value);
     useEffect(() => {
       const debouncedSearch = debounce(() => {
         onSearch(localName);
-      }, 300);
+      }, 1000);
 
       debouncedSearch();
       return () => debouncedSearch.cancel();
@@ -180,7 +196,8 @@ const ListContent = () => {
       </ListHeaderContainer>
     );
   };
-  const ListContent = () => {
+
+  const ListMainContent = () => {
     const LeftBar = () => {
       const ListCategory = () => {
         const handleCategoryClick = (id, type) => {
@@ -240,7 +257,6 @@ const ListContent = () => {
         const CategoryItem = (props) => {
           const { id, icon, name, onCount, offCount, type } = props;
           const isActive = activeCategoryId === id;
-          console.log(activeCategoryId, id);
           const Icon = icon;
           return (
             <CategoryItemContainer
@@ -293,205 +309,18 @@ const ListContent = () => {
         </LeftBarContainer>
       );
     };
-    const RightBar = () => {
-      const [selectedStadium, setSelectedStadium] = useState(null);
-      const [showPopup, setShowPopup] = useState(false);
-      const dummyStadium = [
-        {
-          name: "Sân bóng Bình Dương",
-          image: "/images/std-1.png",
-          ratePoint: 4.5,
-          rateCount: 150,
-          address:
-            "105/4 Khu Phố Đông A, Đông Hoà, Dĩ An, Bình Dương, Việt Nam",
-          tel: "0345111222",
-          type: "football", // Loại sân
-        },
-        {
-          name: "Sân Tân Quý",
-          image: "/images/std-2.png",
-          ratePoint: 4.0,
-          rateCount: 120,
-          address: "Số 10 Đường Tân Quý, Tân Quý, Tân Phú, TP. HCM, Việt Nam",
-          tel: "0377223344",
-          type: "badminton",
-        },
-        {
-          name: "Sân Trần Hưng Đạo",
-          image: "/images/std-3.png",
-          ratePoint: 4.7,
-          rateCount: 200,
-          address:
-            "1/25A Trần Hưng Đạo, P. Cầu Ông Lãnh, Quận 1, TP. HCM, Việt Nam",
-          tel: "0388334455",
-          type: "tennis",
-        },
-        {
-          name: "Sân Nha Trang",
-          image: "/images/std-4.png",
-          ratePoint: 4.8,
-          rateCount: 300,
-          address: "24 Phạm Văn Đồng, Vĩnh Hải, Nha Trang, Khánh Hòa, Việt Nam",
-          tel: "0399445566",
-          type: "volleyball",
-        },
-        {
-          name: "Sân Nguyễn Thị Minh Khai",
-          image: "/images/std-5.png",
-          ratePoint: 4.2,
-          rateCount: 90,
-          address: "56 Nguyễn Thị Minh Khai, Quận 3, TP. HCM, Việt Nam",
-          tel: "0311223344",
-          type: "basketball",
-        },
-        {
-          name: "Sân Lê Văn Sỹ",
-          image: "/images/std-6.png",
-          ratePoint: 3.9,
-          rateCount: 75,
-          address: "12 Lê Văn Sỹ, Quận Tân Bình, TP. HCM, Việt Nam",
-          tel: "0344556677",
-          type: "football",
-        },
-        {
-          name: "Sân Đinh Tiên Hoàng",
-          image: "/images/std-7.png",
-          ratePoint: 4.6,
-          rateCount: 180,
-          address: "17A Đinh Tiên Hoàng, Quận Bình Thạnh, TP. HCM, Việt Nam",
-          tel: "0322334455",
-          type: "badminton",
-        },
-        {
-          name: "Sân Nguyễn Huệ",
-          image: "/images/std-8.png",
-          ratePoint: 4.3,
-          rateCount: 140,
-          address: "24 Nguyễn Huệ, Quận 1, TP. HCM, Việt Nam",
-          tel: "0366223344",
-          type: "volleyball",
-        },
-        {
-          name: "Sân Nguyễn Văn Trỗi",
-          image: "/images/std-9.png",
-          ratePoint: 4.1,
-          rateCount: 110,
-          address:
-            "12 Nguyễn Văn Trỗi, P.10, Quận Phú Nhuận, TP. HCM, Việt Nam",
-          tel: "0333445566",
-          type: "tennis",
-        },
-        {
-          name: "Sân Võ Văn Tần",
-          image: "/images/std-1.png",
-          ratePoint: 4.4,
-          rateCount: 190,
-          address: "18 Võ Văn Tần, Quận 3, TP. HCM, Việt Nam",
-          tel: "0355667788",
-          type: "football",
-        },
-        {
-          name: "Sân Lê Quang Định",
-          image: "/images/std-2.png",
-          ratePoint: 3.8,
-          rateCount: 85,
-          address: "Số 4, Lê Quang Định, Bình Thạnh, TP. HCM, Việt Nam",
-          tel: "0377889900",
-          type: "basketball",
-        },
-        {
-          name: "Sân Lý Tự Trọng",
-          image: "/images/std-3.png",
-          ratePoint: 4.9,
-          rateCount: 320,
-          address: "45 Lý Tự Trọng, Quận 1, TP. HCM, Việt Nam",
-          tel: "0344556677",
-          type: "tennis",
-        },
-        {
-          name: "Sân Lê Văn Sỹ",
-          image: "/images/std-4.png",
-          ratePoint: 4.2,
-          rateCount: 100,
-          address: "76 Lê Văn Sỹ, Quận Tân Bình, TP. HCM, Việt Nam",
-          tel: "0333445566",
-          type: "football",
-        },
-        {
-          name: "Sân Hoàng Văn Thụ",
-          image: "/images/std-5.png",
-          ratePoint: 4.6,
-          rateCount: 230,
-          address: "62 Hoàng Văn Thụ, Phú Nhuận, TP. HCM, Việt Nam",
-          tel: "0355778899",
-          type: "football",
-        },
-        {
-          name: "Sân Nguyễn Thị Minh Khai",
-          image: "/images/std-6.png",
-          ratePoint: 4.5,
-          rateCount: 210,
-          address: "82 Nguyễn Thị Minh Khai, Quận 3, TP. HCM, Việt Nam",
-          tel: "0322334455",
-          type: "volleyball",
-        },
-        {
-          name: "Sân Lê Lợi",
-          image: "/images/std-7.png",
-          ratePoint: 4.0,
-          rateCount: 140,
-          address: "15 Lê Lợi, Huế, Thừa Thiên Huế, Việt Nam",
-          tel: "0366557788",
-          type: "basketball",
-        },
-        {
-          name: "Sân Hải Thượng Lãn Ông",
-          image: "/images/std-8.png",
-          ratePoint: 4.3,
-          rateCount: 170,
-          address: "12 Hải Thượng Lãn Ông, Hà Nội, Việt Nam",
-          tel: "0388990011",
-          type: "football",
-        },
-        {
-          name: "Sân Nguyễn Văn Cừ",
-          image: "/images/std-9.png",
-          ratePoint: 4.7,
-          rateCount: 280,
-          address: "45B Nguyễn Văn Cừ, Long Biên, Hà Nội, Việt Nam",
-          tel: "0399112233",
-          type: "badminton",
-        },
-        {
-          name: "Sân Trần Phú",
-          image: "/images/std-1.png",
-          ratePoint: 3.9,
-          rateCount: 95,
-          address: "25 Trần Phú, Đà Nẵng, Việt Nam",
-          tel: "0333445566",
-          type: "volleyball",
-        },
-        {
-          name: "Sân Lê Duẩn",
-          image: "/images/std-2.png",
-          ratePoint: 4.8,
-          rateCount: 300,
-          address: "14 Lê Duẩn, Đà Nẵng, Việt Nam",
-          tel: "0377991122",
-          type: "tennis",
-        },
-      ];
-
-      const handleDetailClick = (stadium) => {
-        setSelectedStadium(stadium);
-        setShowPopup(true);
-      };
-
-      const closePopup = () => {
-        setShowPopup(false);
-      };
-
+    const RightBar = ({ handleDetailClick, showPopup, selectedStadium }) => {
       const StadiumItem = ({ item }) => {
+        const totalCount = item?.ratings?.reduce(
+          (acc, item) => acc + item.count,
+          0,
+        );
+        const totalRate = item?.ratings?.reduce(
+          (acc, item) => acc + item.rate * item.count,
+          0,
+        );
+
+        const averageRate = totalCount > 0 ? totalRate / totalCount : 0;
         const RateDisplay = ({ score, count }) => {
           const renderStars = (score) => {
             const fullStars = Math.floor(score);
@@ -529,7 +358,7 @@ const ListContent = () => {
             <img src={item?.images[0]} alt="" className="stadium-image" />
             <div className=" stadium-info stadium-info-header">
               <span className="stadium-name">{item.name}</span>
-              <RateDisplay score={item.ratePoint} count={item.rateCount} />
+              <RateDisplay score={averageRate} count={totalCount} />
             </div>
             <div className="stadium-info stadium-info-bottom">
               <div className="stadium-address">
@@ -538,7 +367,7 @@ const ListContent = () => {
               </div>
               <div className="stadium-tel">
                 <TelIcon />
-                <span className="text-tel">{item.tel}</span>
+                <span className="text-tel">{item?.owner?.phone_number}</span>
               </div>
             </div>
             <div className="action">
@@ -647,6 +476,66 @@ const ListContent = () => {
         };
 
         const renderTabContent = () => {
+          const normalizeRatings = (ratingData) => {
+            const fullRates = [1, 2, 3, 4, 5];
+
+            const normalizedData = fullRates.map((rate) => {
+              const existing = ratingData.find((item) => item.rate === rate);
+              return existing ? existing : { rate, count: 0 };
+            });
+
+            return normalizedData.reverse();
+          };
+          const RatingProgress = ({ ratingData }) => {
+            const normalizedData = normalizeRatings(ratingData);
+            const totalCount = normalizedData.reduce(
+              (acc, item) => acc + item.count,
+              0,
+            );
+            const percentages = normalizedData.map((item) => ({
+              rate: item.rate,
+              percentage: totalCount > 0 ? (item.count / totalCount) * 100 : 0,
+            }));
+            const totalRate = normalizedData.reduce(
+              (acc, item) => acc + item.rate * item.count,
+              0,
+            );
+            const averageRate = totalCount > 0 ? totalRate / totalCount : 0;
+
+            return (
+              <div className="rating-container">
+                <div className="rating-progress">
+                  {percentages.map((item) => (
+                    <div
+                      className="rating-item"
+                      key={item.rate}
+                      style={{ marginBottom: "10px" }}
+                    >
+                      <p style={{ margin: 0 }}>{item.rate}</p>
+                      <div
+                        style={{
+                          height: "10px",
+                          width: "100%",
+                          backgroundColor: "#e0e0e0",
+                          borderRadius: "5px",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            width: `${item.percentage}%`,
+                            backgroundColor: "#1D9A6C",
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="averageRate">{averageRate.toFixed(1)}</div>
+              </div>
+            );
+          };
           switch (activeTab) {
             case "info":
               return (
@@ -654,64 +543,32 @@ const ListContent = () => {
                   <div className="overview">
                     <p className="title">Tổng quan</p>
                     <p className="address">
-                      <AddressIcon /> {selectedStadium.address}
+                      <AddressIcon /> {fieldDetail.address}
                     </p>
                     <p className="tel">
-                      <TelIcon /> {selectedStadium.tel}
+                      <TelIcon /> {fieldDetail?.owner?.phone_number}
                     </p>
                     <p className="time">
-                      <TimeIcon />
+                      <TimeIcon />{" "}
+                      <span>
+                        {fieldDetail.open_time} - {fieldDetail.close_time}
+                      </span>
                     </p>
                   </div>
                   <div className="media">
                     <p className="title">Ảnh và video</p>
                     <div className="list-images">
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-1.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-2.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-3.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-4.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-1.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
-                      <div className="image-item">
-                        <img
-                          src="/images/sub-image-2.png"
-                          alt=""
-                          className="image"
-                        />
-                      </div>
+                      {fieldDetail?.images?.length > 0 &&
+                        fieldDetail.images.map((item, index) => (
+                          <div className="image-item" key={index}>
+                            <img src={item} alt="" className="image" />
+                          </div>
+                        ))}
                     </div>
                   </div>
                   <div className="rate">
                     <p className="title">Đánh giá</p>
+                    <RatingProgress ratingData={fieldDetail?.ratings} />
                   </div>
                 </div>
               );
@@ -731,7 +588,9 @@ const ListContent = () => {
               return null;
           }
         };
-
+        if (!fieldDetail) {
+          return null;
+        }
         return (
           <PopupBarContainer>
             <div className="popup-header">
@@ -741,14 +600,14 @@ const ListContent = () => {
                     <ArrowLeftIcon />
                     Quay lại
                   </button>
-                  <h3 className="name">{selectedStadium.name}</h3>
-                  <h3 className="type">{selectedStadium?.type}</h3>
+                  <h3 className="name">{fieldDetail.name}</h3>
+                  <h3 className="type">{fieldDetail?.type}</h3>
                 </div>
                 <div className="booking">
-                  <a href={`/booking/${selectedStadium.id}`}>Đặt sân</a>
+                  <a href={`/booking/${fieldDetail.id}`}>Đặt sân</a>
                 </div>
               </div>
-              <img src={selectedStadium.image} alt="" className="popup-image" />
+              <img src={fieldDetail.image} alt="" className="popup-image" />
             </div>
             <div className="popup-content">
               <div className="tabs">
@@ -776,7 +635,6 @@ const ListContent = () => {
           </PopupBarContainer>
         );
       };
-
       return (
         <RightBarContainer>
           {fields &&
@@ -791,14 +649,18 @@ const ListContent = () => {
     return (
       <ListContentContainer>
         <LeftBar />
-        <RightBar />
+        <RightBar
+          handleDetailClick={handleDetailClick}
+          showPopup={showPopup}
+          selectedStadium={selectedStadium}
+        />
       </ListContentContainer>
     );
   };
   return (
     <ListContainer>
       <ListHeader value={name} onSearch={setName} />
-      <ListContent />
+      <ListMainContent />
     </ListContainer>
   );
 };

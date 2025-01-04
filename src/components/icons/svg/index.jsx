@@ -266,7 +266,7 @@ export const TennisMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_2011)">
+      <g clipPath="url(#clip0_2313_2011)">
         <g filter="url(#filter0_f_2313_2011)">
           <ellipse
             cx="15.9998"
@@ -364,7 +364,7 @@ export const FootballMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_5653)">
+      <g clipPath="url(#clip0_2313_5653)">
         <g filter="url(#filter0_f_2313_5653)">
           <ellipse
             cx="15.9998"
@@ -462,7 +462,7 @@ export const VolleyballMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_1995)">
+      <g clipPath="url(#clip0_2313_1995)">
         <g filter="url(#filter0_f_2313_1995)">
           <ellipse
             cx="15.9998"
@@ -560,7 +560,7 @@ export const BasketballMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_1730)">
+      <g clipPath="url(#clip0_2313_1730)">
         <g filter="url(#filter0_f_2313_1730)">
           <ellipse
             cx="15.9998"
@@ -686,7 +686,7 @@ export const BadmintonMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_1822)">
+      <g clipPath="url(#clip0_2313_1822)">
         <g filter="url(#filter0_f_2313_1822)">
           <ellipse
             cx="15.9998"
@@ -800,7 +800,7 @@ export const MultipleMark = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_2313_1931)">
+      <g clipPath="url(#clip0_2313_1931)">
         <g filter="url(#filter0_f_2313_1931)">
           <ellipse
             cx="15.9998"
@@ -1392,7 +1392,7 @@ export const LogoMobile = () => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <rect x="0.5" y="0.5" width="39" height="39" rx="7.5" stroke="#E5E7EB" />
-      <g clip-path="url(#clip0_2677_3388)">
+      <g clipPath="url(#clip0_2677_3388)">
         <path
           opacity="0.16"
           d="M15.3745 19.0828C15.8106 17.4092 17.4831 15.6888 19.1102 15.2403L29.2544 12.4441C30.8815 11.9956 31.847 12.9888 31.411 14.6624L28.6924 25.0964C28.2564 26.77 26.5839 28.4903 24.9568 28.9388L14.8126 31.735C13.1855 32.1835 12.2199 31.1903 12.656 29.5167L15.3745 19.0828Z"

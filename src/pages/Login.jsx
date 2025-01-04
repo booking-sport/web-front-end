@@ -263,7 +263,6 @@ const Login = ({ onLoginSuccess }) => {
     const handleSubmit = async (e) => {
       e.preventDefault();
       const result = await login(username, password);
-      console.log(result);
       if (result.success) {
         onLoginSuccess(result.user);
         window.location.href = "/";

@@ -2,13 +2,21 @@ import styled from "styled-components";
 
 export const MapContainer = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 79px);
   position: relative;
+  @media (max-width: 767px) {
+    height: calc(100vh - 77px);
+  }
+  .maplibregl-ctrl-bottom-right {
+    display: none;
+  }
   .maplibregl-popup {
-    position: unset !important;
     transform: unset !important;
+    max-width: unset !important;
+    width: 100%;
+    z-index: 100;
     .maplibregl-popup-content {
-      width: 512px;
+      max-width: 512px;
       position: fixed;
       top: 95px;
       left: 24px;
@@ -19,10 +27,62 @@ export const MapContainer = styled.div`
       /* elevation/5 */
       box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
       overflow: hidden;
+      width: calc(100% - 48px);
       .maplibregl-popup-close-button {
         color: white;
         font-size: 24px;
         padding: 6px 12px;
+      }
+      @media (min-width: 512px) {
+        width: 100%;
+      }
+    }
+  }
+  .focus-location {
+    position: fixed;
+    bottom: 50px;
+    right: 16px;
+    z-index: 100;
+  }
+  .focus-user-location-btn {
+    position: relative;
+    border-radius: 8px;
+    display: block;
+    width: 29px;
+    height: 29px;
+    overflow: hidden;
+    cursor: pointer;
+    -webkit-transition: background-color 0.16s ease-out;
+    transition: background-color 0.16s ease-out;
+    background: #fff;
+    border: 0;
+    box-shadow:
+      0 1px 2px rgba(60, 64, 67, 0.3),
+      0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    > span {
+      background-image: url(/icons/focus-location.png);
+      background-size: 36px 18px;
+      -webkit-animation: acquiring-animation 1s steps(1) infinite;
+      animation: acquiring-animation 1s steps(1) infinite;
+      color: #202124;
+      display: block;
+      height: 18px;
+      left: 6px;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      top: 6px;
+      width: 18px;
+    }
+    @keyframes acquiring-animation {
+      0% {
+        background-position: 0 0;
+      }
+      50% {
+        background-position: -18px 0;
+      }
+      100% {
+        background-position: 0 0;
       }
     }
   }
@@ -34,6 +94,7 @@ export const FilterSortContainer = styled.div`
   position: absolute;
   top: 27px;
   left: 24px;
+  z-index: 10;
   @media (max-width: 1919px) {
     max-width: calc(100% - 48px);
   }
@@ -94,21 +155,109 @@ export const FilterContainer = styled.div`
   }
   .popup-bar {
     position: absolute;
-    top: 50px;
+    top: 65px;
     left: 0;
     width: 100%;
-    max-height: 200px;
     overflow-y: auto;
     background: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border: 1px solid #ddd;
     z-index: 1000;
+    border-radius: 16px;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 3px 14px 0px rgba(0, 0, 0, 0.08);
+    max-height: 500px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    @media (max-width: 767px) {
+      top: 50px;
+    }
   }
 
   .popup-item {
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    .top {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      justify-content: space-between;
+      a.booking {
+        border-radius: 60px;
+        background: var(--primary-main, #1d9a6c);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        border: 0;
+        display: flex;
+        align-items: center;
+        color: var(--primary-contrast, #fff);
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        gap: 8px;
+        text-decoration: none;
+        padding: 6px 16px;
+        white-space: nowrap;
+      }
+      .info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        h3.name {
+          color: #000;
+
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          /* Typography/Subtitle 1 */
+          font-family: Inter;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 157%;
+        }
+      }
+    }
+    .address {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      span {
+        color: var(--text-secondary, #4d5761);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Typography/Caption */
+        font-family: Inter;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 166%;
+        white-space: nowrap;
+        position: relative;
+
+        &:not(:last-child):after {
+          content: "";
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          right: -14px;
+          top: 43%;
+          border-radius: 10px;
+          background-color: #4d5761;
+        }
+      }
+    }
   }
 
   .popup-item:hover {
@@ -119,7 +268,8 @@ export const FilterContainer = styled.div`
     background-color: #e5e5e5;
   }
   .field-detail {
-    width: 512px;
+    max-width: 512px;
+    width: calc(100% - 48px);
     position: fixed;
     top: 95px;
     left: 24px;
@@ -129,6 +279,13 @@ export const FilterContainer = styled.div`
     background: var(--background-paper, #fff);
     box-shadow: 0px 1px 14px 0px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    > div {
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 `;
 export const SortContainer = styled.div`
@@ -188,10 +345,16 @@ export const FieldDetailContainer = styled.div`
     top: 12px;
     right: 16px;
     padding: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
   }
   .stadium-info {
     .top {
       padding: 20px 20px 8px;
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
       .name-rate {
         display: flex;
         flex-direction: column;
@@ -222,6 +385,28 @@ export const FieldDetailContainer = styled.div`
           line-height: 166%;
         }
       }
+      .booking {
+        border-radius: 60px;
+        background: var(--primary-main, #1d9a6c);
+        box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+        border: 0;
+        display: flex;
+        align-items: center;
+        color: var(--primary-contrast, #fff);
+        font-family: Inter;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px;
+        gap: 8px;
+        text-decoration: none;
+        padding: 6px 16px;
+        white-space: nowrap;
+      }
+      @media (max-width: 767px) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
     .mid {
       padding: 12px 20px 16px;
@@ -232,6 +417,9 @@ export const FieldDetailContainer = styled.div`
         display: flex;
         align-items: center;
         gap: 8px;
+        svg {
+          min-width: 20px;
+        }
       }
     }
     .bottom {
@@ -262,9 +450,12 @@ export const FieldDetailContainer = styled.div`
           overflow: hidden;
           min-width: 100px;
           height: 150px;
+          max-width: 49%;
+          flex: 1;
           > img {
             object-fit: cover;
             max-width: 100%;
+            height: 100%;
           }
         }
       }
