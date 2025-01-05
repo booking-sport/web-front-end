@@ -27,13 +27,17 @@ import {
   SortContainer,
   StarsContainer,
 } from "./StyledMap";
-import { getSportsFields } from "@components/services/fieldsService";
+import {
+  getSportsFields,
+  getFieldComment,
+} from "@components/services/fieldsService";
 import { getRoute } from "@components/services/routeServices";
 
 const Map = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [fields, setFields] = useState([]);
+  const [commentField, setCommentField] = useState();
   const [filterResults, setFilterResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +49,6 @@ const Map = () => {
   const [showFieldDetail, setShowFieldDetail] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedStadium, setSelectedStadium] = useState(null);
-
   const apiKey = process.env.REACT_APP_DIRECTIONS_API_KEY || "";
   const RateDisplay = ({ score, count }) => {
     const renderStars = (score) => {
@@ -552,6 +555,19 @@ const Map = () => {
     fetchFields();
   }, [type]);
 
+  useEffect(() => {
+    const fetchFieldComment = async () => {
+      try {
+        const data = await getFieldComment(selectedField.id);
+        setCommentField(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFieldComment();
+  }, [selectedField]);
   // useEffect(() => {
   //   const fetchFieldsDetail = async () => {
   //     try {

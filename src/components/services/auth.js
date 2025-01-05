@@ -48,6 +48,6 @@ export const logout = async () => {
     console.error("Logout Error:", error);
   } finally {
     Cookies.remove("jwt");
-    window.location.reload();
+    window.location.href = "/";
   }
 };

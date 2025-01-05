@@ -132,3 +132,25 @@ export const updatePaymentStatus = async (orderCode, status) => {
     throw error;
   }
 };
+export const getFieldComment = async (stadiumId) => {
+  try {
+    const response = await apiClient.get(`/comments/stadium/${stadiumId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching comment:", error);
+    throw error;
+  }
+};
+export const getOrderHistory = async (userToken) => {
+  try {
+    const response = await apiClient.get(`/orders/self/player`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching order history:", error);
+    throw error;
+  }
+};
