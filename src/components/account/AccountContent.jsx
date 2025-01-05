@@ -9,6 +9,7 @@ import {
   ShowButton,
   ErrorMessage,
 } from "./StyledAccount";
+import Cookies from "js-cookie";
 import { CalendarIcon, CloseIcon, EyeIcon } from "@components/icons/svg";
 import DatePicker from "react-datepicker";
 import {
@@ -16,6 +17,7 @@ import {
   editNameById,
   editNumberById,
   getUserInfoById,
+  getOrderHistory,
 } from "@components/services/fieldsService";
 const AccountContent = () => {
   const savedUser = JSON.parse(localStorage.getItem("user"));
@@ -25,6 +27,7 @@ const AccountContent = () => {
   const [error, setError] = useState("");
 
   const [user, setUser] = useState("");
+  const [history, setHistory] = useState("");
 
   const handleChangePassword = () => setChangePassword(true);
   const handleChangeName = () => setChangeName(true);
@@ -34,6 +37,7 @@ const AccountContent = () => {
     setChangeName(false);
     setChangePhoneNumber(false);
   };
+  const jwt = Cookies.get("jwt");
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -46,6 +50,18 @@ const AccountContent = () => {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    const fetchOrderHistory = async () => {
+      try {
+        const data = await getOrderHistory(jwt);
+        setHistory(data?.data);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    fetchOrderHistory();
+  }, []);
+  console.log(history);
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -207,13 +223,26 @@ const AccountContent = () => {
     },
   ];
   const BookingTable = () => {
-    // Map status codes to display labels and colors
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
+
+    const totalRows = history.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const currentData = history.slice(startIndex, endIndex);
+
     const statusMap = {
       pending: { label: "CHỜ XỬ LÝ", className: "status-pending" },
       success: { label: "THÀNH CÔNG", className: "status-success" },
       cancelled: { label: "ĐÃ HỦY", className: "status-cancelled" },
     };
 
+    const handlePageChange = (newPage) => {
+      if (newPage >= 1 && newPage <= totalPages) {
+        setCurrentPage(newPage);
+      }
+    };
     return (
       <div className="table-container">
         <table className="booking-table">
@@ -228,37 +257,54 @@ const AccountContent = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((item, index) => {
-              const status = statusMap[item.order_status] || {
-                label: "KHÔNG XÁC ĐỊNH",
-                className: "status-unknown",
-              };
+            {currentData.length > 0 &&
+              currentData.map((item, index) => {
+                const status = statusMap[item.order_status] || {
+                  label: "KHÔNG XÁC ĐỊNH",
+                  className: "status-unknown",
+                };
 
-              return (
-                <tr key={item.id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    {new Date(item.date).toLocaleDateString()} -{" "}
-                    {item.begin_time}
-                  </td>
-                  <td>Sân {item.field_id}</td>
-                  <td>{item.price} VND</td>
-                  <td>
-                    <span className={`status-label ${status.className}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="btn-detail">Chi tiết</button>
-                    <button className="btn-cancel">Hủy đặt sân</button>
-                  </td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={item.id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      {new Date(item.date).toLocaleDateString()} -{" "}
+                      {item.begin_time}
+                    </td>
+                    <td>Sân {item.field_id}</td>
+                    <td>{item.price} VND</td>
+                    <td>
+                      <span className={`status-label ${status.className}`}>
+                        {status.label}
+                      </span>
+                    </td>
+                    <td>
+                      <button className="btn-detail">Chi tiết</button>
+                      <button className="btn-cancel">Hủy đặt sân</button>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
         <div className="table-footer">
-          Rows per page: <strong>10</strong> | 1-5 of {dummyData.length}
+          <div className="pagination">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -500,7 +546,7 @@ const AccountContent = () => {
           <div className="history-header">
             <div className="title">
               <p className="text-title">Lịch sử đặt sân</p>
-              <p className="subtitle">Số lượng giao dịch: {dummyData.length}</p>
+              <p className="subtitle">Số lượng giao dịch: {history.length}</p>
             </div>
             <TimeContainer>
               <span>Thời gian</span>

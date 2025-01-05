@@ -56,6 +56,7 @@ export const AccountManagerContainer = styled.div`
     padding: 10px 20px;
     border-radius: 4px;
     z-index: 1000;
+    white-space: nowrap;
   }
 `;
 export const AccountImage = styled.img`
