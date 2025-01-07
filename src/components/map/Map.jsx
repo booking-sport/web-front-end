@@ -37,7 +37,6 @@ const Map = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [fields, setFields] = useState([]);
-  const [commentField, setCommentField] = useState();
   const [filterResults, setFilterResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -555,19 +554,7 @@ const Map = () => {
     fetchFields();
   }, [type]);
 
-  useEffect(() => {
-    const fetchFieldComment = async () => {
-      try {
-        const data = await getFieldComment(selectedField.id);
-        setCommentField(data?.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFieldComment();
-  }, [selectedField]);
+
   // useEffect(() => {
   //   const fetchFieldsDetail = async () => {
   //     try {

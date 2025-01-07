@@ -44,9 +44,14 @@ import { debounce } from "lodash";
 import {
   getSportsFields,
   getFieldDetails,
+  getFieldComment,
+  postReviewComment,
 } from "@components/services/fieldsService";
 
 import { useDebouncedCallback } from "use-debounce";
+import Gallery from "./gallery/Gallery";
+import ReviewForm from "./review/Review";
+
 const ListContent = () => {
   const [fields, setFields] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +63,8 @@ const ListContent = () => {
   const [selectedField, setSelectedField] = useState();
   const [selectedStadium, setSelectedStadium] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-
+  const [commentField, setCommentField] = useState();
+  console.log(fieldDetail);
   useEffect(() => {
     const fetchFields = async () => {
       try {
@@ -85,6 +91,48 @@ const ListContent = () => {
     };
     fetchFieldsDetail();
   }, [selectedField]);
+  useEffect(() => {
+    const fetchFieldComment = async () => {
+      try {
+        const data = await getFieldComment(selectedField.id);
+        setCommentField(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFieldComment();
+  }, [selectedField]);
+  const handleReviewSubmit = async (reviewData) => {
+    const result = await postReviewComment(selectedField?.id, reviewData);
+    if (result.data) {
+      console.log(result);
+    } else {
+      setError(result.message);
+      console.log(error);
+    }
+  };
+  const calculateTimeSinceComment = (createAt) => {
+    const createdTime = new Date(createAt).getTime();
+    const now = Date.now();
+
+    const diffInSeconds = Math.floor((now - createdTime) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minutes ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hours ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} days ago`;
+    }
+  };
+
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedDateTime, setSelectedDateTime] = useState({
@@ -196,7 +244,7 @@ const ListContent = () => {
       </ListHeaderContainer>
     );
   };
-
+  console.log(commentField, 999);
   const ListMainContent = () => {
     const LeftBar = () => {
       const ListCategory = () => {
@@ -524,6 +572,7 @@ const ListContent = () => {
                         <div
                           style={{
                             height: "100%",
+                            borderRadius: "5px",
                             width: `${item.percentage}%`,
                             backgroundColor: "#1D9A6C",
                           }}
@@ -533,6 +582,73 @@ const ListContent = () => {
                   ))}
                 </div>
                 <div className="averageRate">{averageRate.toFixed(1)}</div>
+              </div>
+            );
+          };
+          const RateDetail = ({ comments }) => {
+            const [visibleCount, setVisibleCount] = useState(5);
+
+            const handleShowMore = () => {
+              setVisibleCount((prev) => prev + 5);
+            };
+            const RateDisplay = ({ score }) => {
+              const renderStars = (score) => {
+                const fullStars = Math.floor(score);
+                const hasHalfStar = score % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                const stars = [];
+
+                for (let i = 0; i < fullStars; i++) {
+                  stars.push(<FaStar key={`full-${i}`} color="#ffa500" />);
+                }
+
+                if (hasHalfStar) {
+                  stars.push(<FaStarHalfAlt key="half" color="#ffa500" />);
+                }
+
+                for (let i = 0; i < emptyStars; i++) {
+                  stars.push(<FaRegStar key={`empty-${i}`} color="#ccc" />);
+                }
+                return stars;
+              };
+
+              return (
+                <RateDisplayContainer>
+                  <StarsContainer>{renderStars(score)}</StarsContainer>
+                </RateDisplayContainer>
+              );
+            };
+            const RateItem = ({ item }) => {
+              return (
+                <div className="rate-item">
+                  <div className="user-info">
+                    <img src={item.avatar_url || "/icons/Avatar.svg"} alt="" />
+                    <p className="name">{item.full_name}</p>
+                  </div>
+                  <div className="score">
+                    <RateDisplay score={item.rate} />
+                    <span>{calculateTimeSinceComment(item.created_at)}</span>
+                  </div>
+                  <div className="comment">
+                    <p className="text">{item.comment}</p>
+                    <div className="images">
+                      {item.images?.length > 0 && (
+                        <Gallery photos={item.images} />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            };
+            return (
+              <div className="rate-container">
+                {comments?.slice(0, visibleCount).map((comment, index) => (
+                  <RateItem key={index} item={comment} />
+                ))}
+                {visibleCount < comments?.length && (
+                  <button onClick={handleShowMore}>Xem thêm</button>
+                )}
               </div>
             );
           };
@@ -569,6 +685,12 @@ const ListContent = () => {
                   <div className="rate">
                     <p className="title">Đánh giá</p>
                     <RatingProgress ratingData={fieldDetail?.ratings} />
+                    <div className="rate-detail">
+                      <RateDetail comments={commentField} />
+                    </div>
+                    <div style={{ padding: "20px" }}>
+                      <ReviewForm onSubmit={handleReviewSubmit} />
+                    </div>
                   </div>
                 </div>
               );
