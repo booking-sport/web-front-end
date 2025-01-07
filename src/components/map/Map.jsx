@@ -329,7 +329,7 @@ const Map = () => {
     }
   };
 
-  const FilterSort = () => {
+  const FilterSort = ({ setType, setActiveButton }) => {
     const Filter = ({ value, onSearch }) => {
       const [localName, setLocalName] = useState(value);
       useEffect(() => {
@@ -454,10 +454,15 @@ const Map = () => {
         </FilterContainer>
       );
     };
-    const Sort = () => {
+    const Sort = ({ setType, setActiveButton }) => {
       const handleButtonClick = (id, type) => {
-        setActiveButton(id);
-        setType(type);
+        if (activeButton === id) {
+          setActiveButton(null);
+          setType("");
+        } else {
+          setActiveButton(id);
+          setType(type);
+        }
       };
       const sortList = [
         {
@@ -536,7 +541,7 @@ const Map = () => {
     return (
       <FilterSortContainer>
         <Filter value={nameSearch} onSearch={setNameSearch} />
-        <Sort />
+        <Sort setType={setType} setActiveButton={setActiveButton} />
       </FilterSortContainer>
     );
   };
@@ -553,7 +558,6 @@ const Map = () => {
     };
     fetchFields();
   }, [type]);
-
 
   // useEffect(() => {
   //   const fetchFieldsDetail = async () => {
@@ -593,7 +597,7 @@ const Map = () => {
   }, [type, nameSearch]);
   return (
     <MapContainer className="map-container" ref={mapContainer}>
-      <FilterSort />
+      <FilterSort setType={setType} setActiveButton={setActiveButton} />
       <div className="focus-location">
         <button
           className="focus-user-location-btn"

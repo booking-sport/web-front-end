@@ -249,8 +249,13 @@ const ListContent = () => {
     const LeftBar = () => {
       const ListCategory = () => {
         const handleCategoryClick = (id, type) => {
-          setActiveCategoryId(id);
-          setType(type);
+           if (activeCategoryId === id) {
+             setActiveCategoryId(null);
+             setType("");
+           } else {
+             setActiveCategoryId(id);
+             setType(type);
+           }
         };
         const category = [
           {
@@ -299,7 +304,7 @@ const ListContent = () => {
             name: "Sân phức hợp",
             onCount: 112,
             offCount: 7,
-            type: "football",
+            type: "multiple",
           },
         ];
         const CategoryItem = (props) => {

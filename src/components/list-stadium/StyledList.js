@@ -320,6 +320,8 @@ export const RightBarContainer = styled.div`
   gap: 20px;
   flex-wrap: wrap;
   overflow: auto;
+  width: 100%;
+  box-sizing: border-box;
 `;
 export const StadiumItemContainer = styled.div`
   border-radius: 12px;
