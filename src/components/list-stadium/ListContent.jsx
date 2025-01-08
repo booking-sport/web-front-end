@@ -51,6 +51,7 @@ import {
 import { useDebouncedCallback } from "use-debounce";
 import Gallery from "./gallery/Gallery";
 import ReviewForm from "./review/Review";
+import Cookies from "js-cookie";
 
 const ListContent = () => {
   const [fields, setFields] = useState([]);
@@ -104,7 +105,12 @@ const ListContent = () => {
     };
     fetchFieldComment();
   }, [selectedField]);
+  const jwt = Cookies.get("jwt") || null;
+
   const handleReviewSubmit = async (reviewData) => {
+    if (!jwt) {
+      window.location.href = "/login";
+    }
     const result = await postReviewComment(selectedField?.id, reviewData);
     if (result.data) {
       console.log(result);
@@ -249,13 +255,13 @@ const ListContent = () => {
     const LeftBar = () => {
       const ListCategory = () => {
         const handleCategoryClick = (id, type) => {
-           if (activeCategoryId === id) {
-             setActiveCategoryId(null);
-             setType("");
-           } else {
-             setActiveCategoryId(id);
-             setType(type);
-           }
+          if (activeCategoryId === id) {
+            setActiveCategoryId(null);
+            setType("");
+          } else {
+            setActiveCategoryId(id);
+            setType(type);
+          }
         };
         const category = [
           {
