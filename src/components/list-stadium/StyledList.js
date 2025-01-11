@@ -320,6 +320,8 @@ export const RightBarContainer = styled.div`
   gap: 20px;
   flex-wrap: wrap;
   overflow: auto;
+  width: 100%;
+  box-sizing: border-box;
 `;
 export const StadiumItemContainer = styled.div`
   border-radius: 12px;
@@ -650,6 +652,66 @@ export const PopupBarContainer = styled.div`
     }
   }
   .tab-content.open-time {
+  }
+  .tab-content .rate-detail {
+    .rate-container {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      .rate-item {
+        display: flex;
+        gap: 8px;
+        flex-direction: column;
+        .user-info {
+          display: flex;
+          gap: 16px;
+          color: var(--text-primary, #111927);
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          text-overflow: ellipsis;
+          font-family: Inter;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 157%;
+        }
+        .score {
+          display: flex;
+          gap: 8px;
+          span {
+            color: var(--text-secondary, #4d5761);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            text-overflow: ellipsis;
+            font-family: Inter;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 157%;
+          }
+        }
+        .comment {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          .text {
+            color: #000;
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            text-overflow: ellipsis;
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 157%;
+          }
+        }
+      }
+    }
   }
   .book-popup {
     display: flex;
