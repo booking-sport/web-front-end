@@ -65,7 +65,6 @@ const ListContent = () => {
   const [selectedStadium, setSelectedStadium] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [commentField, setCommentField] = useState();
-  console.log(fieldDetail);
   useEffect(() => {
     const fetchFields = async () => {
       try {
@@ -250,7 +249,6 @@ const ListContent = () => {
       </ListHeaderContainer>
     );
   };
-  console.log(commentField, 999);
   const ListMainContent = () => {
     const LeftBar = () => {
       const ListCategory = () => {
@@ -730,7 +728,7 @@ const ListContent = () => {
               <div className="header">
                 <div className="title">
                   <button className="close-btn" onClick={closePopup}>
-                    <ArrowLeftIcon />
+                    <ArrowLeftIcon color="#111927" />
                     Quay lại
                   </button>
                   <h3 className="name">{fieldDetail.name}</h3>

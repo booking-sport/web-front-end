@@ -708,6 +708,7 @@ export const PopupBarContainer = styled.div`
             font-style: normal;
             font-weight: 400;
             line-height: 157%;
+            overflow-x: hidden;
           }
         }
       }

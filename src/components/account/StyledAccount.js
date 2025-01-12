@@ -168,7 +168,7 @@ export const AccountContainer = styled.div`
           background-color: rgba(247, 144, 9, 0.12);
         }
 
-        .status-cancelled {
+        .status-canceled {
           color: #b42318;
           background-color: rgba(240, 68, 56, 0.12);
         }
@@ -438,4 +438,327 @@ export const ErrorMessage = styled.p`
   font-style: normal;
   font-weight: 500;
   line-height: 157%;
+`;
+
+export const OrderDetailContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+
+  .order-detail {
+    border-radius: 20px;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 9px 46px 0px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 968px;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    .btn-close {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--text-secondary, #4d5761);
+      font-feature-settings:
+        "liga" off,
+        "clig" off;
+      /* Typography/Body 1 */
+      font-family: Inter;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 150%; /* 24px */
+    }
+    .order-header {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-radius: 12px;
+      border: 1px solid var(--primary-outlineBorder, rgba(29, 154, 108, 0.5));
+      background: linear-gradient(91deg, #78c7aa -19.95%, #158e62 100%);
+      justify-content: center;
+      align-items: center;
+      &.pending {
+        background: linear-gradient(
+          91deg,
+          rgba(247, 144, 9, 0.12) -19.95%,
+          #b54708 100%
+        );
+        border: 1px solid #b54708;
+      }
+      &.canceled {
+        background: linear-gradient(
+          91deg,
+          rgba(240, 68, 56, 0.12)-19.95%,
+          #b42318 100%
+        );
+        border: 1px solid #b42318;
+      }
+      .status-message {
+        color: var(--primary-contrast, #fff);
+        text-align: center;
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Typography/H6 */
+        font-family: "Plus Jakarta Sans";
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 120%;
+      }
+    }
+    .content-info {
+      border-radius: 16px;
+      border: 1px solid var(--divider, #d6d6e1);
+      box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      background: var(--background-paper, #fff);
+      padding: 20px;
+      .title {
+        color: var(--text-primary, #111927);
+        font-feature-settings:
+          "liga" off,
+          "clig" off;
+        /* Typography/H6 */
+        font-family: "Plus Jakarta Sans";
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 120%;
+        margin-bottom: 20px;
+      }
+      .info {
+        .stadium,
+        .address {
+          color: var(--text-primary, #111927);
+          font-feature-settings:
+            "liga" off,
+            "clig" off;
+          /* Typography/Subtitle 1 */
+          font-family: Inter;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 157%;
+          display: flex;
+          gap: 5px;
+          margin-bottom: 8px;
+          .name-title {
+            color: var(--text-secondary, #4d5761);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/Subtitle 1 */
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 157%;
+          }
+        }
+        .detail-info {
+          border-radius: 12px;
+          background: var(--primary-selected, rgba(29, 154, 108, 0.08));
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          .date {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/Subtitle 1 */
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 157%;
+            display: flex;
+            gap: 5px;
+            .name-title {
+              color: var(--text-secondary, #4d5761);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/Body 1 */
+              font-family: Inter;
+              font-size: 16px;
+              font-style: normal;
+              font-weight: 400;
+              line-height: 150%;
+            }
+          }
+          .order-item {
+            display: flex;
+            justify-content: space-between;
+            > div {
+              display: flex;
+              gap: 5px;
+              .title {
+                color: var(--text-secondary, #4d5761);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Body 2 */
+                font-family: Inter;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 157%;
+                margin: 0;
+              }
+              .time {
+                color: var(--text-primary, #111927);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Subtitle 2 */
+                font-family: Inter;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+                margin: 0;
+              }
+              .price {
+                color: var(--error-main, #f04438);
+                font-feature-settings:
+                  "liga" off,
+                  "clig" off;
+                /* Typography/Subtitle 2 */
+                font-family: Inter;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 157%;
+              }
+              .delete {
+                padding: 0;
+              }
+            }
+          }
+        }
+        .line {
+          margin: 12px 0;
+          height: 1px;
+          width: 100%;
+          background: #dfe4ec;
+        }
+        .overview {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .title {
+            color: var(--text-secondary, #4d5761);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 157%;
+            margin: 0;
+          }
+          .total-time {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/Subtitle 1 */
+            font-family: Inter;
+            font-size: 16px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 157%;
+          }
+          .total-price {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/H6 */
+            font-family: "Plus Jakarta Sans";
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%;
+          }
+          .payment-method {
+            color: var(--text-primary, #111927);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/Caption */
+            font-family: Inter;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 166%;
+          }
+          .must-payment {
+            color: var(--error-main, #f04438);
+            font-feature-settings:
+              "liga" off,
+              "clig" off;
+            /* Typography/H5 */
+            font-family: "Plus Jakarta Sans";
+            font-size: 24px;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 120%;
+          }
+        }
+      }
+    }
+    .status-icon.pending {
+      width: 55px;
+      height: 55px;
+      border: 0.5px solid #b54708;
+      background: linear-gradient(
+        91deg,
+        rgba(247, 144, 9, 0.12) -19.95%,
+        #b54708 100%
+      );
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      > svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+    .status-icon.canceled {
+      width: 55px;
+      height: 55px;
+      border: 0.5px solid #b54708;
+      background:;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      > svg {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
 `;

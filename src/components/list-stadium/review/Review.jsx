@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
-
+import { FaStar, FaTrashAlt } from "react-icons/fa";
+import { IoIosClose } from "react-icons/io";
 const Container = styled.div`
   max-width: 100%;
   margin: 0 auto;
@@ -9,6 +9,9 @@ const Container = styled.div`
   border: 1px solid #ddd;
   border-radius: 8px;
   background: #fff;
+  input[type="file"] {
+    margin-bottom: 16px;
+  }
 `;
 
 const Title = styled.h2`
@@ -25,6 +28,13 @@ const Textarea = styled.textarea`
   resize: none;
   margin-bottom: 20px;
   box-sizing: border-box;
+`;
+
+const CharCount = styled.div`
+  text-align: right;
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 10px;
 `;
 
 const StarRating = styled.div`
@@ -48,12 +58,26 @@ const ImagePreview = styled.div`
   gap: 10px;
   margin-bottom: 20px;
 
-  img {
-    width: 80px;
-    height: 80px;
-    border-radius: 5px;
-    object-fit: cover;
-    border: 1px solid #ddd;
+  .image-container {
+    position: relative;
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 5px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+    }
+    .delete-icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border-radius: 50%;
+      padding: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
   }
 `;
 
@@ -83,6 +107,17 @@ const ReviewForm = ({ onSubmit }) => {
     setImages((prev) => [...prev, ...imageUrls]);
   };
 
+  const handleDeleteImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCommentChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 255) {
+      setComment(value);
+    }
+  };
+
   const handleSubmit = () => {
     if (!comment || rating === 0) {
       alert("Please provide a comment and rating!");
@@ -108,8 +143,9 @@ const ReviewForm = ({ onSubmit }) => {
         rows="5"
         placeholder="Write your comment..."
         value={comment}
-        onChange={(e) => setComment(e.target.value)}
+        onChange={handleCommentChange}
       />
+      <CharCount>{comment.length}/255</CharCount>
       <StarRating>
         {[1, 2, 3, 4, 5].map((star) => (
           <span
@@ -129,7 +165,13 @@ const ReviewForm = ({ onSubmit }) => {
       />
       <ImagePreview>
         {images.map((image, index) => (
-          <img key={index} src={image} alt={`Preview ${index + 1}`} />
+          <div key={index} className="image-container">
+            <img src={image} alt={`Preview ${index + 1}`} />
+            <IoIosClose
+              className="delete-icon"
+              onClick={() => handleDeleteImage(index)}
+            />
+          </div>
         ))}
       </ImagePreview>
       <Button onClick={handleSubmit}>Submit Review</Button>
