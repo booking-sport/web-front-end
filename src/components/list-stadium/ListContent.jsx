@@ -46,6 +46,7 @@ import {
   getFieldDetails,
   getFieldComment,
   postReviewComment,
+  getAllSportsFields,
 } from "@components/services/fieldsService";
 
 import { useDebouncedCallback } from "use-debounce";
@@ -55,6 +56,7 @@ import Cookies from "js-cookie";
 
 const ListContent = () => {
   const [fields, setFields] = useState([]);
+  const [allFields, setAllFields] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [type, setType] = useState("");
@@ -78,6 +80,19 @@ const ListContent = () => {
     };
     fetchFields();
   }, [type, name]);
+  useEffect(() => {
+    const fetchAllFields = async () => {
+      try {
+        const data = await getAllSportsFields();
+        setAllFields(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllFields();
+  }, []);
   useEffect(() => {
     const fetchFieldsDetail = async () => {
       try {
@@ -249,7 +264,7 @@ const ListContent = () => {
       </ListHeaderContainer>
     );
   };
-  const ListMainContent = () => {
+  const ListMainContent = ({ allFields }) => {
     const LeftBar = () => {
       const ListCategory = () => {
         const handleCategoryClick = (id, type) => {
@@ -261,53 +276,66 @@ const ListContent = () => {
             setType(type);
           }
         };
+        const stadiumTypeCounts = {
+          football: 0,
+          volleyball: 0,
+          basketball: 0,
+          tennis: 0,
+          badminton: 0,
+          multiple: 0,
+        };
+        allFields?.forEach((stadium) => {
+          if (stadiumTypeCounts.hasOwnProperty(stadium.stadium_type)) {
+            stadiumTypeCounts[stadium.stadium_type]++;
+          }
+        });
         const category = [
           {
             id: 1,
             icon: FootballIcon,
             name: "Sân banh",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.football,
+            offCount: 0,
             type: "football",
           },
           {
             id: 2,
             icon: BadmintonIcon,
             name: "Sân cầu lông",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.badminton,
+            offCount: 0,
             type: "badminton",
           },
           {
             id: 3,
             icon: TennisIcon,
             name: "Sân tennis",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.tennis,
+            offCount: 0,
             type: "tennis",
           },
           {
             id: 4,
             icon: VolleyballIcon,
             name: "Sân bóng chuyền",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.volleyball,
+            offCount: 0,
             type: "volleyball",
           },
           {
             id: 5,
             icon: BasketballIcon,
             name: "Sân bóng rổ",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.basketball,
+            offCount: 0,
             type: "basketball",
           },
           {
             id: 6,
             icon: MultipleIcon,
             name: "Sân phức hợp",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.multiple,
+            offCount: 0,
             type: "multiple",
           },
         ];
@@ -791,7 +819,7 @@ const ListContent = () => {
   return (
     <ListContainer>
       <ListHeader value={name} onSearch={setName} />
-      <ListMainContent />
+      <ListMainContent allFields={allFields} />
     </ListContainer>
   );
 };

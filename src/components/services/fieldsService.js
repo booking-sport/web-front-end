@@ -20,6 +20,20 @@ export const getSportsFields = async (type, name) => {
     throw error;
   }
 };
+export const getAllSportsFields = async () => {
+  try {
+    // const response = await apiClient.get(`/stadiums/all?${queryParams}`);
+    const response = await apiClient.get(`/stadiums/all`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching sports fields:", error);
+    throw error;
+  }
+};
 
 export const getFieldDetails = async (id) => {
   try {

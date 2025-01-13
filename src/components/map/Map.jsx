@@ -239,7 +239,7 @@ const Map = () => {
             div.style.backgroundImage = "url(/icons/SanCauLong.svg)";
           } else if (type === "tennis") {
             div.style.backgroundImage = "url(/icons/SanTennis.svg)";
-          } else if (type === "complex") {
+          } else if (type === "multiple") {
             div.style.backgroundImage = "url(/icons/SanPhucHop.svg)";
           } else if (type === "basketball") {
             div.style.backgroundImage = "url(/icons/SanBongRo.svg)";
