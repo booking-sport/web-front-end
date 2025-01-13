@@ -450,7 +450,7 @@ export const OrderDetailContainer = styled.div`
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.55);
-
+  z-index: 10;
   .order-detail {
     border-radius: 20px;
     background: var(--background-paper, #fff);
@@ -699,8 +699,20 @@ export const OrderDetailContainer = styled.div`
             font-style: normal;
             font-weight: 700;
             line-height: 120%;
+            .price {
+              color: var(--text-primary, #111927);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
+            }
           }
-          .payment-method {
+          .deposit {
             color: var(--text-primary, #111927);
             font-feature-settings:
               "liga" off,
@@ -711,6 +723,18 @@ export const OrderDetailContainer = styled.div`
             font-style: normal;
             font-weight: 500;
             line-height: 166%;
+            .deposit-value {
+              color: var(--success-main, #15b79e);
+              font-feature-settings:
+                "liga" off,
+                "clig" off;
+              /* Typography/H6 */
+              font-family: "Plus Jakarta Sans";
+              font-size: 18px;
+              font-style: normal;
+              font-weight: 700;
+              line-height: 120%;
+            }
           }
           .must-payment {
             color: var(--error-main, #f04438);
@@ -760,5 +784,29 @@ export const OrderDetailContainer = styled.div`
         height: 24px;
       }
     }
+  }
+`;
+export const CancelPopupContainer = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10;
+  .cancel-content {
+    border-radius: 20px;
+    background: var(--background-paper, #fff);
+    box-shadow: 0px 9px 46px 0px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 968px;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 `;

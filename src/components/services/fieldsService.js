@@ -196,6 +196,25 @@ export const updatePaymentStatus = async (orderCode, status) => {
     throw error;
   }
 };
+export const updateOrderDetailStatus = async (orderCode, status) => {
+  try {
+    const response = await apiClient.put(
+      `/orders/detail/${orderCode}`,
+      {
+        orderStatus: status,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking payment status:", error);
+    throw error;
+  }
+};
 export const getFieldComment = async (stadiumId) => {
   try {
     const response = await apiClient.get(`/comments/stadium/${stadiumId}`, {
