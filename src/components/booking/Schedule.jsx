@@ -885,6 +885,7 @@ const Schedule = () => {
       setIsFixedBooking(true);
       setSelectedDate(tempStartDate);
       closePopupFixedBooking();
+      setDayOfWeek(moment(tempStartDate).format("dddd").toLowerCase());
     };
     return (
       <FixedSettingPopup className="popup-overlay">
