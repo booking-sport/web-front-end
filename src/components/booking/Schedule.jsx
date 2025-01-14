@@ -733,15 +733,15 @@ const Schedule = () => {
                   <div className="info">
                     <div className="info-item">
                       <span className="title">Chủ tài khoản</span>
-                      <span className="value">{paymentInfo.full_name}</span>
+                      <span className="value">{paymentInfo?.full_name}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Số tài khoản</span>
-                      <span className="value">{paymentInfo.bank_account}</span>
+                      <span className="value">{paymentInfo?.bank_account}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Ngân hàng</span>
-                      <span className="value">{paymentInfo.bank}</span>
+                      <span className="value">{paymentInfo?.bank}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Nội dung chuyển khoản</span>
