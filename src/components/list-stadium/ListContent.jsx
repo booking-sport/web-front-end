@@ -44,11 +44,19 @@ import { debounce } from "lodash";
 import {
   getSportsFields,
   getFieldDetails,
+  getFieldComment,
+  postReviewComment,
+  getAllSportsFields,
 } from "@components/services/fieldsService";
 
 import { useDebouncedCallback } from "use-debounce";
+import Gallery from "./gallery/Gallery";
+import ReviewForm from "./review/Review";
+import Cookies from "js-cookie";
+
 const ListContent = () => {
   const [fields, setFields] = useState([]);
+  const [allFields, setAllFields] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [type, setType] = useState("");
@@ -58,7 +66,7 @@ const ListContent = () => {
   const [selectedField, setSelectedField] = useState();
   const [selectedStadium, setSelectedStadium] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
-
+  const [commentField, setCommentField] = useState();
   useEffect(() => {
     const fetchFields = async () => {
       try {
@@ -73,6 +81,19 @@ const ListContent = () => {
     fetchFields();
   }, [type, name]);
   useEffect(() => {
+    const fetchAllFields = async () => {
+      try {
+        const data = await getAllSportsFields();
+        setAllFields(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllFields();
+  }, []);
+  useEffect(() => {
     const fetchFieldsDetail = async () => {
       try {
         const data = await getFieldDetails(selectedField.id);
@@ -85,6 +106,53 @@ const ListContent = () => {
     };
     fetchFieldsDetail();
   }, [selectedField]);
+  useEffect(() => {
+    const fetchFieldComment = async () => {
+      try {
+        const data = await getFieldComment(selectedField.id);
+        setCommentField(data?.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFieldComment();
+  }, [selectedField]);
+  const jwt = Cookies.get("jwt") || null;
+
+  const handleReviewSubmit = async (reviewData) => {
+    if (!jwt) {
+      window.location.href = "/login";
+    }
+    const result = await postReviewComment(selectedField?.id, reviewData);
+    if (result.data) {
+      console.log(result);
+    } else {
+      setError(result.message);
+      console.log(error);
+    }
+  };
+  const calculateTimeSinceComment = (createAt) => {
+    const createdTime = new Date(createAt).getTime();
+    const now = Date.now();
+
+    const diffInSeconds = Math.floor((now - createdTime) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minutes ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hours ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} days ago`;
+    }
+  };
+
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedDateTime, setSelectedDateTime] = useState({
@@ -196,62 +264,79 @@ const ListContent = () => {
       </ListHeaderContainer>
     );
   };
-
-  const ListMainContent = () => {
+  const ListMainContent = ({ allFields }) => {
     const LeftBar = () => {
       const ListCategory = () => {
         const handleCategoryClick = (id, type) => {
-          setActiveCategoryId(id);
-          setType(type);
+          if (activeCategoryId === id) {
+            setActiveCategoryId(null);
+            setType("");
+          } else {
+            setActiveCategoryId(id);
+            setType(type);
+          }
         };
+        const stadiumTypeCounts = {
+          football: 0,
+          volleyball: 0,
+          basketball: 0,
+          tennis: 0,
+          badminton: 0,
+          multiple: 0,
+        };
+        allFields?.forEach((stadium) => {
+          if (stadiumTypeCounts.hasOwnProperty(stadium.stadium_type)) {
+            stadiumTypeCounts[stadium.stadium_type]++;
+          }
+        });
         const category = [
           {
             id: 1,
             icon: FootballIcon,
             name: "Sân banh",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.football,
+            offCount: 0,
             type: "football",
           },
           {
             id: 2,
             icon: BadmintonIcon,
             name: "Sân cầu lông",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.badminton,
+            offCount: 0,
             type: "badminton",
           },
           {
             id: 3,
             icon: TennisIcon,
             name: "Sân tennis",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.tennis,
+            offCount: 0,
             type: "tennis",
           },
           {
             id: 4,
             icon: VolleyballIcon,
             name: "Sân bóng chuyền",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.volleyball,
+            offCount: 0,
             type: "volleyball",
           },
           {
             id: 5,
             icon: BasketballIcon,
             name: "Sân bóng rổ",
-            onCount: 112,
-            offCount: 7,
+            onCount: stadiumTypeCounts.basketball,
+            offCount: 0,
             type: "basketball",
           },
           {
             id: 6,
             icon: MultipleIcon,
             name: "Sân phức hợp",
-            onCount: 112,
-            offCount: 7,
-            type: "football",
+            onCount: stadiumTypeCounts.multiple,
+            offCount: 0,
+            type: "multiple",
           },
         ];
         const CategoryItem = (props) => {
@@ -524,6 +609,7 @@ const ListContent = () => {
                         <div
                           style={{
                             height: "100%",
+                            borderRadius: "5px",
                             width: `${item.percentage}%`,
                             backgroundColor: "#1D9A6C",
                           }}
@@ -533,6 +619,73 @@ const ListContent = () => {
                   ))}
                 </div>
                 <div className="averageRate">{averageRate.toFixed(1)}</div>
+              </div>
+            );
+          };
+          const RateDetail = ({ comments }) => {
+            const [visibleCount, setVisibleCount] = useState(5);
+
+            const handleShowMore = () => {
+              setVisibleCount((prev) => prev + 5);
+            };
+            const RateDisplay = ({ score }) => {
+              const renderStars = (score) => {
+                const fullStars = Math.floor(score);
+                const hasHalfStar = score % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                const stars = [];
+
+                for (let i = 0; i < fullStars; i++) {
+                  stars.push(<FaStar key={`full-${i}`} color="#ffa500" />);
+                }
+
+                if (hasHalfStar) {
+                  stars.push(<FaStarHalfAlt key="half" color="#ffa500" />);
+                }
+
+                for (let i = 0; i < emptyStars; i++) {
+                  stars.push(<FaRegStar key={`empty-${i}`} color="#ccc" />);
+                }
+                return stars;
+              };
+
+              return (
+                <RateDisplayContainer>
+                  <StarsContainer>{renderStars(score)}</StarsContainer>
+                </RateDisplayContainer>
+              );
+            };
+            const RateItem = ({ item }) => {
+              return (
+                <div className="rate-item">
+                  <div className="user-info">
+                    <img src={item.avatar_url || "/icons/Avatar.svg"} alt="" />
+                    <p className="name">{item.full_name}</p>
+                  </div>
+                  <div className="score">
+                    <RateDisplay score={item.rate} />
+                    <span>{calculateTimeSinceComment(item.created_at)}</span>
+                  </div>
+                  <div className="comment">
+                    <p className="text">{item.comment}</p>
+                    <div className="images">
+                      {item.images?.length > 0 && (
+                        <Gallery photos={item.images} />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            };
+            return (
+              <div className="rate-container">
+                {comments?.slice(0, visibleCount).map((comment, index) => (
+                  <RateItem key={index} item={comment} />
+                ))}
+                {visibleCount < comments?.length && (
+                  <button onClick={handleShowMore}>Xem thêm</button>
+                )}
               </div>
             );
           };
@@ -569,6 +722,12 @@ const ListContent = () => {
                   <div className="rate">
                     <p className="title">Đánh giá</p>
                     <RatingProgress ratingData={fieldDetail?.ratings} />
+                    <div className="rate-detail">
+                      <RateDetail comments={commentField} />
+                    </div>
+                    <div style={{ padding: "20px" }}>
+                      <ReviewForm onSubmit={handleReviewSubmit} />
+                    </div>
                   </div>
                 </div>
               );
@@ -597,7 +756,7 @@ const ListContent = () => {
               <div className="header">
                 <div className="title">
                   <button className="close-btn" onClick={closePopup}>
-                    <ArrowLeftIcon />
+                    <ArrowLeftIcon color="#111927" />
                     Quay lại
                   </button>
                   <h3 className="name">{fieldDetail.name}</h3>
@@ -660,7 +819,7 @@ const ListContent = () => {
   return (
     <ListContainer>
       <ListHeader value={name} onSearch={setName} />
-      <ListMainContent />
+      <ListMainContent allFields={allFields} />
     </ListContainer>
   );
 };

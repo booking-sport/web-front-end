@@ -95,7 +95,7 @@ export const FacebookIcon = () => {
     </svg>
   );
 };
-export const ArrowLeftIcon = () => {
+export const ArrowLeftIcon = (props) => {
   return (
     <svg
       width="20"
@@ -106,7 +106,7 @@ export const ArrowLeftIcon = () => {
     >
       <path
         d="M15.8332 10H4.1665M4.1665 10L9.99984 15.8334M4.1665 10L9.99984 4.16669"
-        stroke="#111927"
+        stroke={props ? props.color : "#111927"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -274,7 +274,7 @@ export const TennisMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -323,9 +323,9 @@ export const TennisMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -345,8 +345,8 @@ export const TennisMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_2011">
           <rect width="32" height="50.963" fill="white" />
@@ -372,7 +372,7 @@ export const FootballMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -421,9 +421,9 @@ export const FootballMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -443,8 +443,8 @@ export const FootballMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_5653">
           <rect width="32" height="50.963" fill="white" />
@@ -470,7 +470,7 @@ export const VolleyballMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -519,9 +519,9 @@ export const VolleyballMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -541,8 +541,8 @@ export const VolleyballMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_1995">
           <rect width="32" height="50.963" fill="white" />
@@ -568,7 +568,7 @@ export const BasketballMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -645,9 +645,9 @@ export const BasketballMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -667,8 +667,8 @@ export const BasketballMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_1730">
           <rect width="32" height="50.963" fill="white" />
@@ -694,7 +694,7 @@ export const BadmintonMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -759,9 +759,9 @@ export const BadmintonMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -781,8 +781,8 @@ export const BadmintonMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_1822">
           <rect width="32" height="50.963" fill="white" />
@@ -808,7 +808,7 @@ export const MultipleMark = () => {
             rx="5.33333"
             ry="2.96296"
             fill="black"
-            fill-opacity="0.12"
+            fillOpacity="0.12"
           />
         </g>
         <mask
@@ -1017,9 +1017,9 @@ export const MultipleMark = () => {
           width="15.4072"
           height="10.6668"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend
             mode="normal"
             in="SourceGraphic"
@@ -1039,8 +1039,8 @@ export const MultipleMark = () => {
           y2="46.2221"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0.5" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.5" />
         </linearGradient>
         <clipPath id="clip0_2313_1931">
           <rect width="32" height="50.963" fill="white" />
@@ -1642,6 +1642,174 @@ export const RightIcon = (props) => {
         d="M9.70492 6L8.29492 7.41L12.8749 12L8.29492 16.59L9.70492 18L15.7049 12L9.70492 6Z"
         fill="#6C737F"
       />
+    </svg>
+  );
+};
+export const Success = () => {
+  return (
+    <svg
+      width="63"
+      height="68"
+      viewBox="0 0 63 68"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M34.2732 9.60096L50.0866 13.807C55.915 15.3572 58.2604 19.5542 56.7184 25.2667L51.4959 44.6142C50.4912 48.3361 48.4355 50.6566 45.5539 51.4346C45.6672 50.6553 45.7254 49.8433 45.7254 49.0021V30.7751C45.7254 22.8775 40.6236 17.5679 33.0046 17.5679H22.3955L22.7557 16.2334C24.2977 10.5209 28.5373 8.07532 34.2732 9.60096Z"
+        fill="url(#paint0_linear_2606_9348)"
+      />
+      <path
+        d="M13.4102 17.7035H32.8959C36.5951 17.7035 39.6512 18.99 41.7832 21.205C43.9167 23.4216 45.1584 26.6034 45.1584 30.4524V48.6793C45.1584 52.5169 43.9169 55.6931 41.7834 57.907C39.6514 60.1194 36.5952 61.406 32.8959 61.406H13.4102C9.71093 61.406 6.64887 60.1194 4.51113 57.9066C2.37206 55.6925 1.12533 52.5163 1.12533 48.6793V30.4524C1.12533 26.6039 2.37227 23.4222 4.51132 21.2054C6.649 18.99 9.71095 17.7035 13.4102 17.7035Z"
+        fill="url(#paint1_linear_2606_9348)"
+        stroke="url(#paint2_linear_2606_9348)"
+        strokeWidth="0.916667"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <g opacity="0.5" filter="url(#filter0_f_2606_9348)">
+        <path
+          d="M45.7364 50.5004C45.799 49.9103 45.831 49.3029 45.831 48.6793V30.4524C45.831 22.5548 40.7292 17.2451 33.1103 17.2451H22.7251L17.9629 34.887C16.4162 40.6172 18.844 44.7102 24.5049 46.2159L40.1116 50.3669C42.2281 50.9299 44.117 50.9656 45.7364 50.5004Z"
+          fill="url(#paint3_linear_2606_9348)"
+        />
+      </g>
+      <g filter="url(#filter1_d_2606_9348)">
+        <mask id="path-4-inside-1_2606_9348" fill="white">
+          <path d="M20.522 46.9026C20.0144 46.9026 19.5069 46.7121 19.1194 46.3289L13.7423 41.0109C12.9674 40.2445 12.9674 39.003 13.7423 38.2388C14.5173 37.4723 15.7703 37.4701 16.5453 38.2365L20.522 42.1695L29.8757 32.9186C30.6507 32.1521 31.9037 32.1521 32.6787 32.9186C33.4536 33.685 33.4536 34.9265 32.6787 35.693L21.9246 46.3289C21.5371 46.7121 21.0296 46.9026 20.522 46.9026Z" />
+        </mask>
+        <path
+          d="M20.522 46.9026C20.0144 46.9026 19.5069 46.7121 19.1194 46.3289L13.7423 41.0109C12.9674 40.2445 12.9674 39.003 13.7423 38.2388C14.5173 37.4723 15.7703 37.4701 16.5453 38.2365L20.522 42.1695L29.8757 32.9186C30.6507 32.1521 31.9037 32.1521 32.6787 32.9186C33.4536 33.685 33.4536 34.9265 32.6787 35.693L21.9246 46.3289C21.5371 46.7121 21.0296 46.9026 20.522 46.9026Z"
+          fill="url(#paint4_linear_2606_9348)"
+        />
+        <path
+          d="M13.7423 38.2388L13.8711 38.3693L13.8713 38.3691L13.7423 38.2388ZM16.5453 38.2365L16.4164 38.3669L16.5453 38.2365ZM20.522 42.1695L20.3931 42.2999L20.522 42.4274L20.6509 42.2999L20.522 42.1695ZM32.6787 35.693L32.5498 35.5626L32.6787 35.693ZM21.9246 46.3289L22.0535 46.4592L21.9246 46.3289ZM20.522 46.7192C20.0602 46.7192 19.5997 46.5461 19.2483 46.1985L18.9905 46.4592C19.414 46.8781 19.9687 47.0859 20.522 47.0859V46.7192ZM19.2483 46.1985L13.8713 40.8806L13.6134 41.1413L18.9905 46.4592L19.2483 46.1985ZM13.8713 40.8806C13.1688 40.1858 13.169 39.0616 13.8711 38.3693L13.6136 38.1082C12.7658 38.9443 12.766 40.3032 13.6134 41.1413L13.8713 40.8806ZM13.8713 38.3691C14.575 37.6731 15.7131 37.6714 16.4164 38.3669L16.6742 38.1062C15.8276 37.2688 14.4595 37.2716 13.6134 38.1084L13.8713 38.3691ZM16.4164 38.3669L20.3931 42.2999L20.6509 42.0392L16.6742 38.1062L16.4164 38.3669ZM20.6509 42.2999L30.0047 33.0489L29.7468 32.7882L20.3931 42.0392L20.6509 42.2999ZM30.0047 33.0489C30.7082 32.3531 31.8463 32.3531 32.5498 33.0489L32.8076 32.7882C31.9612 31.9511 30.5932 31.9511 29.7468 32.7882L30.0047 33.0489ZM32.5498 33.0489C33.2522 33.7436 33.2522 34.8679 32.5498 35.5626L32.8076 35.8233C33.6551 34.9851 33.6551 33.6264 32.8076 32.7882L32.5498 33.0489ZM32.5498 35.5626L21.7957 46.1985L22.0535 46.4592L32.8076 35.8233L32.5498 35.5626ZM21.7957 46.1985C21.4443 46.5461 20.9838 46.7192 20.522 46.7192V47.0859C21.0753 47.0859 21.63 46.8781 22.0535 46.4592L21.7957 46.1985Z"
+          fill="url(#paint5_linear_2606_9348)"
+          fillOpacity="0.5"
+          mask="url(#path-4-inside-1_2606_9348)"
+        />
+      </g>
+      <defs>
+        <filter
+          id="filter0_f_2606_9348"
+          x="1.00586"
+          y="0.745117"
+          width="61.3252"
+          height="66.5771"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          />
+          <feGaussianBlur
+            stdDeviation="8.25"
+            result="effect1_foregroundBlur_2606_9348"
+          />
+        </filter>
+        <filter
+          id="filter1_d_2606_9348"
+          x="8.5778"
+          y="27.7604"
+          width="38.432"
+          height="32.8919"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dx="4.58333" dy="4.58333" />
+          <feGaussianBlur stdDeviation="4.58333" />
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0.454902 0 0 0 0 0.870588 0 0 0 0 0.376471 0 0 0 0.5 0"
+          />
+          <feBlend
+            mode="normal"
+            in2="BackgroundImageFix"
+            result="effect1_dropShadow_2606_9348"
+          />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="effect1_dropShadow_2606_9348"
+            result="shape"
+          />
+        </filter>
+        <linearGradient
+          id="paint0_linear_2606_9348"
+          x1="59.4635"
+          y1="16.2692"
+          x2="22.9874"
+          y2="42.0241"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#9BF763" />
+          <stop offset="1" stopColor="#26AB5B" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_2606_9348"
+          x1="45.7534"
+          y1="17.1094"
+          x2="0.999728"
+          y2="62.1946"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#72DC60" />
+          <stop offset="1" stopColor="#72DC60" stopOpacity="0.35" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_2606_9348"
+          x1="7.82225"
+          y1="22.4433"
+          x2="36.2396"
+          y2="57.8996"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity="0.25" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient
+          id="paint3_linear_2606_9348"
+          x1="47.6902"
+          y1="22.8941"
+          x2="18.4862"
+          y2="44.0366"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#9BF763" />
+          <stop offset="1" stopColor="#26AB5B" />
+        </linearGradient>
+        <linearGradient
+          id="paint4_linear_2606_9348"
+          x1="31.8349"
+          y1="34.9728"
+          x2="9.46831"
+          y2="35.9795"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0.2" />
+        </linearGradient>
+        <linearGradient
+          id="paint5_linear_2606_9348"
+          x1="15.3262"
+          y1="37.2275"
+          x2="32.3924"
+          y2="37.3576"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 };

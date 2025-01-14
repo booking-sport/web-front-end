@@ -480,7 +480,6 @@ const Schedule = () => {
         setErrorMessage(validationError);
         return;
       }
-      setPopupPayment(true);
 
       const deposit = stadium.deposit !== 0 ? paymentMethod : 0;
       const result = await createOrder(
@@ -493,11 +492,13 @@ const Schedule = () => {
       );
       if (result.data) {
         // alert("Orders successfully created");
+        setPopupPayment(true);
         setQrCode(result?.data?.qrCode);
         setOrderCode(result?.data?.orderCode);
       } else {
+        setPopupPayment(false);
         setError(result.message);
-        console.log(error);
+        alert(result.message);
       }
     };
     useEffect(() => {
@@ -517,7 +518,7 @@ const Schedule = () => {
       const checkPaymentInterval = setInterval(async () => {
         try {
           const data = await checkPaymentStatus(orderCode);
-          if (data.status === "PAID") {
+          if (data.data.status === "PAID") {
             clearInterval(countdownInterval);
             clearInterval(checkPaymentInterval);
             setOrderStatus("PAID");
@@ -525,6 +526,7 @@ const Schedule = () => {
             const updatedData = await updatePaymentStatus(orderCode, "paid");
             // console.log("Updated Payment Info:", updatedData);
             handleClosePopupPayment();
+            window.location.reload();
           }
         } catch (error) {
           console.error("Failed to check payment status:", error);
@@ -731,15 +733,15 @@ const Schedule = () => {
                   <div className="info">
                     <div className="info-item">
                       <span className="title">Chủ tài khoản</span>
-                      <span className="value">{paymentInfo.full_name}</span>
+                      <span className="value">{paymentInfo?.full_name}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Số tài khoản</span>
-                      <span className="value">{paymentInfo.bank_account}</span>
+                      <span className="value">{paymentInfo?.bank_account}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Ngân hàng</span>
-                      <span className="value">{paymentInfo.bank}</span>
+                      <span className="value">{paymentInfo?.bank}</span>
                     </div>
                     <div className="info-item">
                       <span className="title">Nội dung chuyển khoản</span>
@@ -988,7 +990,7 @@ const Schedule = () => {
           <div className="header">
             <div className="title">
               <button className="close-btn" onClick={() => navigate(-1)}>
-                <ArrowLeftIcon />
+                <ArrowLeftIcon color="#111927" />
                 Quay lại
               </button>
               <h3 className="name">Lịch sân - {stadium?.name}</h3>

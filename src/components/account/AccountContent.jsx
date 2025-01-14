@@ -8,9 +8,17 @@ import {
   TimeContainer,
   ShowButton,
   ErrorMessage,
+  OrderDetailContainer,
+  CancelPopupContainer,
 } from "./StyledAccount";
 import Cookies from "js-cookie";
-import { CalendarIcon, CloseIcon, EyeIcon } from "@components/icons/svg";
+import {
+  CalendarIcon,
+  CloseIcon,
+  EyeIcon,
+  Success,
+  ArrowLeftIcon,
+} from "@components/icons/svg";
 import DatePicker from "react-datepicker";
 import {
   editPasswordById,
@@ -18,7 +26,12 @@ import {
   editNumberById,
   getUserInfoById,
   getOrderHistory,
+  updateOrderDetailStatus,
 } from "@components/services/fieldsService";
+import { MdPendingActions } from "react-icons/md";
+import { FcCancel } from "react-icons/fc";
+import moment from "moment";
+
 const AccountContent = () => {
   const savedUser = JSON.parse(localStorage.getItem("user"));
   const [changePassword, setChangePassword] = useState(false);
@@ -27,7 +40,7 @@ const AccountContent = () => {
   const [error, setError] = useState("");
 
   const [user, setUser] = useState("");
-  const [history, setHistory] = useState("");
+  const [history, setHistory] = useState();
 
   const handleChangePassword = () => setChangePassword(true);
   const handleChangeName = () => setChangeName(true);
@@ -38,6 +51,7 @@ const AccountContent = () => {
     setChangePhoneNumber(false);
   };
   const jwt = Cookies.get("jwt");
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
@@ -61,7 +75,7 @@ const AccountContent = () => {
     };
     fetchOrderHistory();
   }, []);
-  console.log(history);
+
   const DateTimePicker = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -100,142 +114,23 @@ const AccountContent = () => {
       </div>
     );
   };
-  const dummyData = [
-    {
-      id: 1,
-      order_type: "single_booking",
-      date: "2024-12-09T17:00:00.000Z",
-      begin_time: "16:00:00",
-      end_time: "17:00:00",
-      price: 100,
-      created_at: "2024-12-10T11:04:18.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 2,
-      field_id: 2,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 2,
-      order_type: "single_booking",
-      date: "2024-12-09T17:00:00.000Z",
-      begin_time: "16:00:00",
-      end_time: "17:00:00",
-      price: 100,
-      created_at: "2024-12-10T11:06:07.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 2,
-      field_id: 1,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 3,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "08:00:00",
-      end_time: "08:30:00",
-      price: 40,
-      created_at: "2024-12-13T17:51:52.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 6,
-      field_id: 4,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 4,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "08:00:00",
-      end_time: "08:30:00",
-      price: 40,
-      created_at: "2024-12-13T17:58:53.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 7,
-      field_id: 4,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 5,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "17:00:00",
-      end_time: "18:30:00",
-      price: 120,
-      created_at: "2024-12-13T17:58:53.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 7,
-      field_id: 4,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 6,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "09:00:00",
-      end_time: "09:30:00",
-      price: 40,
-      created_at: "2024-12-13T18:00:51.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 8,
-      field_id: 3,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 7,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "17:00:00",
-      end_time: "19:30:00",
-      price: 150,
-      created_at: "2024-12-13T18:00:51.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 8,
-      field_id: 2,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-    {
-      id: 8,
-      order_type: "single_booking",
-      date: "2024-12-11T17:00:00.000Z",
-      begin_time: "20:00:00",
-      end_time: "22:30:00",
-      price: 120,
-      created_at: "2024-12-13T18:00:51.000Z",
-      updated_at: "2024-12-16T03:25:18.000Z",
-      order_id: 8,
-      field_id: 3,
-      order_status: "pending",
-      stadium_id: 1,
-      player_id: 1,
-    },
-  ];
+
   const BookingTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
 
-    const totalRows = history.length;
+    const totalRows = history?.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    const currentData = history.slice(startIndex, endIndex);
-
+    const currentData = history?.slice(startIndex, endIndex);
+    const [orderDetail, setOrderDetail] = useState();
+    const [isShowDetail, setIsShowDetail] = useState(false);
+    const [isCancelPopup, setIsCancelPopup] = useState(false);
     const statusMap = {
       pending: { label: "CHỜ XỬ LÝ", className: "status-pending" },
       success: { label: "THÀNH CÔNG", className: "status-success" },
-      cancelled: { label: "ĐÃ HỦY", className: "status-cancelled" },
+      canceled: { label: "ĐÃ HỦY", className: "status-canceled" },
     };
 
     const handlePageChange = (newPage) => {
@@ -243,6 +138,18 @@ const AccountContent = () => {
         setCurrentPage(newPage);
       }
     };
+    const handleDetail = (item) => {
+      setIsShowDetail(true);
+      setOrderDetail(item);
+    };
+    const handleClose = () => {
+      setIsShowDetail(false);
+    };
+    const handleCancel = (item) => {
+      setIsCancelPopup(true);
+      setOrderDetail(item);
+    };
+
     return (
       <div className="table-container">
         <table className="booking-table">
@@ -257,7 +164,7 @@ const AccountContent = () => {
             </tr>
           </thead>
           <tbody>
-            {currentData.length > 0 &&
+            {currentData?.length > 0 &&
               currentData.map((item, index) => {
                 const status = statusMap[item.order_status] || {
                   label: "KHÔNG XÁC ĐỊNH",
@@ -271,16 +178,27 @@ const AccountContent = () => {
                       {new Date(item.date).toLocaleDateString()} -{" "}
                       {item.begin_time}
                     </td>
-                    <td>Sân {item.field_id}</td>
-                    <td>{item.price} VND</td>
+                    <td>{item.field_name}</td>
+                    <td>{item.price.toLocaleString("vi-VN")} VND</td>
                     <td>
                       <span className={`status-label ${status.className}`}>
                         {status.label}
                       </span>
                     </td>
                     <td>
-                      <button className="btn-detail">Chi tiết</button>
-                      <button className="btn-cancel">Hủy đặt sân</button>
+                      <button
+                        className="btn-detail"
+                        onClick={() => handleDetail(item)}
+                      >
+                        Chi tiết
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        disabled={item.order_status === "canceled"}
+                        onClick={() => handleCancel(item)}
+                      >
+                        Hủy đặt sân
+                      </button>
                     </td>
                   </tr>
                 );
@@ -306,10 +224,19 @@ const AccountContent = () => {
             </button>
           </div>
         </div>
+        {isShowDetail && (
+          <OrderDetail item={orderDetail} handleClose={handleClose} />
+        )}
+        {isCancelPopup && (
+          <CancelConfirmPopup
+            item={orderDetail}
+            setIsCancelPopup={setIsCancelPopup}
+          />
+        )}
       </div>
     );
   };
-  const Dialog = () => {
+  const Dialog = ({ item }) => {
     const [visibility, setVisibility] = useState({
       isHidden: true,
       isRePassHidden: true,
@@ -489,7 +416,187 @@ const AccountContent = () => {
       </div>
     );
   };
-
+  const CancelConfirmPopup = ({ item, setIsCancelPopup }) => {
+    const handleClosePopup = () => {
+      setIsCancelPopup(false);
+    };
+    const handleOrderCancel = async (id, status) => {
+      const orderStatus = await updateOrderDetailStatus(id, status);
+      setIsCancelPopup(false);
+    };
+    return (
+      <CancelPopupContainer>
+        <div className="cancel-content">
+          <p className="message">Bạn có đồng ý huỷ sân và mất cọc không?</p>
+          <div className="actions">
+            <button className="btn-close" onClick={() => handleClosePopup()}>
+              Quay lại
+            </button>
+            <button
+              className="btn-confirm"
+              onClick={() => handleOrderCancel(item?.id, "canceled")}
+            >
+              Đồng ý
+            </button>
+          </div>
+        </div>
+      </CancelPopupContainer>
+    );
+  };
+  const OrderDetail = ({ item, handleClose }) => {
+    const renderStatusIcon = (status) => {
+      if (status === "pending") return <MdPendingActions color="#fff" />;
+      else if (status === "canceled") return <FcCancel />;
+      else return <Success />;
+    };
+    const renderStatusMessage = (status) => {
+      if (status === "pending") return "Đơn hàng đang được xử lý!";
+      else if (status === "canceled") return "Sân đã bị huỷ!";
+      else return "Bạn đã đặt sân thành công!";
+    };
+    const timeDiff = moment(item?.end_time, "HH:mm").diff(
+      moment(item?.begin_time, "HH:mm"),
+      "minutes",
+    );
+    const formatMinutesToHours = (minutes) => {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return `${hours} giờ ${remainingMinutes} phút`;
+    };
+    return (
+      <OrderDetailContainer>
+        <div className="order-detail">
+          <button className="btn-close" onClick={handleClose}>
+            <ArrowLeftIcon color="#4d5761" /> Quay lại
+          </button>
+          <div className={`order-header ${item.order_status}`}>
+            <div className={`status-icon ${item.order_status}`}>
+              {renderStatusIcon(item.order_status)}
+            </div>
+            <div className="status-message">
+              {renderStatusMessage(item.order_status)}
+            </div>
+          </div>
+          <div className="content-info">
+            <p className="title">Thông tin đặt lịch</p>
+            <div className="info">
+              <div className="stadium">
+                <span className="name-title">Tên sân:</span>
+                <span>{item.stadium_name}</span>
+              </div>
+              <div className="address">
+                <span className="name-title">Địa chỉ:</span>
+                <span>{item.address}</span>
+              </div>
+              <div className="address">
+                <span className="name-title">Người đặt:</span>
+                <span>{item.full_name}</span>
+              </div>
+              <div className="address">
+                <span className="name-title">Số điện thoại</span>
+                <span>{item.phone_number}</span>
+              </div>
+              <div className="address">
+                <span className="name-title">Ghi chú:</span>
+                <span>{item.note}</span>
+              </div>
+              <div className="detail-info">
+                <div className="date">
+                  <span className="name-title">
+                    {item.order_type === "single_booking"
+                      ? "Ngày:"
+                      : "Lịch cố định:"}
+                  </span>
+                  <span>
+                    {item.order_type === "single_booking" && (
+                      <>{new Date(item.date).toLocaleDateString()}</>
+                    )}
+                    {item.order_type === "one_month" && (
+                      <>
+                        {new Date(item.date).toLocaleDateString()} -{" "}
+                        {new Date(
+                          new Date(item.date).setMonth(
+                            new Date(item.date).getMonth() + 1,
+                          ),
+                        ).toLocaleDateString()}
+                      </>
+                    )}
+                    {item.order_type === "six_months" && (
+                      <>
+                        {new Date(item.date).toLocaleDateString()} -{" "}
+                        {new Date(
+                          new Date(item.date).setMonth(
+                            new Date(item.date).getMonth() + 6,
+                          ),
+                        ).toLocaleDateString()}
+                      </>
+                    )}
+                    {item.order_type === "one_year" && (
+                      <>
+                        {new Date(item.date).toLocaleDateString()} -{" "}
+                        {new Date(
+                          new Date(item.date).setMonth(
+                            new Date(item.date).getMonth() + 12,
+                          ),
+                        ).toLocaleDateString()}
+                      </>
+                    )}
+                  </span>
+                </div>
+                <div className="order-item">
+                  <div>
+                    <span className="title">{item.field_name} :</span>
+                    <span className="time">
+                      {item.begin_time} - {item.end_time}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="price">
+                      {item.price.toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="line"></div>
+              <div className="overview">
+                <div className="total-time">
+                  <span className="title">Tổng giờ:</span>
+                  <span className="time">{formatMinutesToHours(timeDiff)}</span>
+                </div>
+                <div className="total-price">
+                  <span className="title">Tổng tiền:</span>
+                  <span className="price">
+                    {item.price.toLocaleString("vi-VN")} đ
+                  </span>
+                </div>
+                <div className="deposit">
+                  <span className="title">Đã cọc:</span>
+                  <span className="deposit-value">
+                    {((item.price * item.deposit) / 100).toLocaleString(
+                      "vi-VN",
+                    )}{" "}
+                    đ
+                  </span>
+                </div>
+                <div className="must-payment">
+                  <span className="title">
+                    Số tiền còn lại (thanh toán khi đến nhận sân)
+                  </span>
+                  <span className="price">
+                    {(
+                      item.price -
+                      (item.price * item.deposit) / 100
+                    ).toLocaleString("vi-VN")}{" "}
+                    đ
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </OrderDetailContainer>
+    );
+  };
   return (
     <AccountContainer>
       <div className="header">
@@ -546,7 +653,7 @@ const AccountContent = () => {
           <div className="history-header">
             <div className="title">
               <p className="text-title">Lịch sử đặt sân</p>
-              <p className="subtitle">Số lượng giao dịch: {history.length}</p>
+              <p className="subtitle">Số lượng giao dịch: {history?.length}</p>
             </div>
             <TimeContainer>
               <span>Thời gian</span>

@@ -37,7 +37,6 @@ const Map = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [fields, setFields] = useState([]);
-  const [commentField, setCommentField] = useState();
   const [filterResults, setFilterResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -240,7 +239,7 @@ const Map = () => {
             div.style.backgroundImage = "url(/icons/SanCauLong.svg)";
           } else if (type === "tennis") {
             div.style.backgroundImage = "url(/icons/SanTennis.svg)";
-          } else if (type === "complex") {
+          } else if (type === "multiple") {
             div.style.backgroundImage = "url(/icons/SanPhucHop.svg)";
           } else if (type === "basketball") {
             div.style.backgroundImage = "url(/icons/SanBongRo.svg)";
@@ -330,7 +329,7 @@ const Map = () => {
     }
   };
 
-  const FilterSort = () => {
+  const FilterSort = ({ setType, setActiveButton }) => {
     const Filter = ({ value, onSearch }) => {
       const [localName, setLocalName] = useState(value);
       useEffect(() => {
@@ -455,10 +454,15 @@ const Map = () => {
         </FilterContainer>
       );
     };
-    const Sort = () => {
+    const Sort = ({ setType, setActiveButton }) => {
       const handleButtonClick = (id, type) => {
-        setActiveButton(id);
-        setType(type);
+        if (activeButton === id) {
+          setActiveButton(null);
+          setType("");
+        } else {
+          setActiveButton(id);
+          setType(type);
+        }
       };
       const sortList = [
         {
@@ -537,7 +541,7 @@ const Map = () => {
     return (
       <FilterSortContainer>
         <Filter value={nameSearch} onSearch={setNameSearch} />
-        <Sort />
+        <Sort setType={setType} setActiveButton={setActiveButton} />
       </FilterSortContainer>
     );
   };
@@ -555,19 +559,6 @@ const Map = () => {
     fetchFields();
   }, [type]);
 
-  useEffect(() => {
-    const fetchFieldComment = async () => {
-      try {
-        const data = await getFieldComment(selectedField.id);
-        setCommentField(data?.data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFieldComment();
-  }, [selectedField]);
   // useEffect(() => {
   //   const fetchFieldsDetail = async () => {
   //     try {
@@ -606,7 +597,7 @@ const Map = () => {
   }, [type, nameSearch]);
   return (
     <MapContainer className="map-container" ref={mapContainer}>
-      <FilterSort />
+      <FilterSort setType={setType} setActiveButton={setActiveButton} />
       <div className="focus-location">
         <button
           className="focus-user-location-btn"

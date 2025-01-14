@@ -378,7 +378,7 @@ const Login = ({ onLoginSuccess }) => {
     return (
       <FormContainer>
         <ButtonBack onClick={handleClickLogin}>
-          <ArrowLeftIcon />
+          <ArrowLeftIcon color="#111927" />
           Quay lại
         </ButtonBack>
         <FormHeader>
