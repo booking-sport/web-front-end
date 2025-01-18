@@ -1,7 +1,7 @@
 import axios from "axios";
 const apiClient = axios.create({
   // baseURL: "http://localhost:4000/api",
-  baseURL: "http://160.30.44.83:4000/api", // Thay bằng URL của API
+  baseURL: "https://api.bk-sport.click/api", // Thay bằng URL của API
   timeout: 10000, // Thời gian timeout (ms)
   headers: {
     "Content-Type": "application/json",
