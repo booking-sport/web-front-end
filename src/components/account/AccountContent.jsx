@@ -271,40 +271,58 @@ const AccountContent = () => {
       }
       return null;
     };
+     const validateNumber = () => {
+       // Phone number validation
+       const phoneRegex = /^[0-9]{10}$/;
+       if (!phoneRegex.test(inputs.phoneNumber)) {
+         return "Số điện thoại phải là 10 chữ số.";
+       }
+       return null;
+     };
+     const validateName = () => {
+       if (inputs.fullName.trim().length < 2) {
+         return "Họ và tên phải có ít nhất 2 ký tự.";
+       }
+       return null;
+     };
 
-    const handleSubmit = async (type) => {
-      let result;
-      switch (type) {
-        case "password":
-          const validationError = validateForm();
-          if (validationError) return setError(validationError);
-          result = await editPasswordById(
-            savedUser?.player_id,
-            inputs.oldPassword,
-            inputs.password,
-          );
-          break;
-        case "name":
-          result = await editNameById(savedUser.player_id, inputs.fullName);
-          break;
-        case "phoneNumber":
-          result = await editNumberById(
-            savedUser?.player_id,
-            inputs.phoneNumber,
-          );
-          break;
-        default:
-          return;
-      }
-      if (result.data) {
-        alert("Change success");
-        setChangePassword(false);
-        setChangeName(false);
-        setChangePhoneNumber(false);
-      } else {
-        setError(result.message);
-      }
-    };
+     const handleSubmit = async (type) => {
+       let result;
+       switch (type) {
+         case "password":
+           const validationError = validateForm();
+           if (validationError) return setError(validationError);
+           result = await editPasswordById(
+             savedUser?.player_id,
+             inputs.oldPassword,
+             inputs.password,
+           );
+           break;
+         case "name":
+           const validationNameError = validateName();
+           if (validationNameError) return setError(validationNameError);
+           result = await editNameById(savedUser.player_id, inputs.fullName);
+           break;
+         case "phoneNumber":
+           const validateNumberError = validateNumber();
+           if (validateNumberError) return setError(validateNumberError);
+           result = await editNumberById(
+             savedUser?.player_id,
+             inputs.phoneNumber,
+           );
+           break;
+         default:
+           return;
+       }
+       if (result.data) {
+         alert("Change success");
+         setChangePassword(false);
+         setChangeName(false);
+         setChangePhoneNumber(false);
+       } else {
+         setError(result.message);
+       }
+     };
 
     return (
       <div className="dialog-container">
