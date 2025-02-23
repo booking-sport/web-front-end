@@ -482,6 +482,7 @@ const Schedule = () => {
       }
 
       const deposit = stadium.deposit !== 0 ? paymentMethod : 0;
+    try {
       const result = await createOrder(
         stadium.id,
         popupInfo.orders,
@@ -490,8 +491,8 @@ const Schedule = () => {
         userName,
         userNumber,
       );
+
       if (result.data) {
-        // alert("Orders successfully created");
         setPopupPayment(true);
         setQrCode(result?.data?.qrCode);
         setOrderCode(result?.data?.orderCode);
@@ -500,6 +501,15 @@ const Schedule = () => {
         setError(result.message);
         alert(result.message);
       }
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        alert("Order bị trùng với người khác. Vui lòng thử lại.");
+        window.location.reload();
+      } else {
+        console.error("Đã xảy ra lỗi:", error);
+        alert("Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.");
+      }
+    }
     };
     useEffect(() => {
       if (!popupPayment) return;
